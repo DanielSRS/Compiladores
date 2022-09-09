@@ -66,6 +66,9 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         elif (line[currentIndex] == '!'):
             currentIndex = currentIndex + 1;
             currentState = 12;
+        elif (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
+            currentIndex = currentIndex + 1;
+            currentState = 18;
         else:
             currentIndex = currentIndex + 1;
             currentState = 0;
@@ -147,11 +150,25 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
     elif(currentState == 12):
         if (line[currentIndex] == '='):
-            print('')
+            t = Token('relacional', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            currentIndex = currentIndex + 1;
         else:
             t = Token('logico', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
+    elif(currentState == 18):
+        if (line[currentIndex] == '='):
+            t = Token('relacional', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            currentIndex = currentIndex + 1;
+        else:
+            t = Token('relacional', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            currentIndex = currentIndex + 1;
     else:
         exitLoop = True;
 
