@@ -1,5 +1,20 @@
+from io import TextIOWrapper
 from os import listdir
 from os.path import isfile, join
+from typing import Callable, NamedTuple, TypeVar
+
+T = TypeVar('T');
+
+class Token(NamedTuple):
+  token: str;
+  line: int;
+  tokenStartIndex: int;
+  tokenEndIndex: int;
+  value: str;
+
+class ResTokenList(NamedTuple):
+  lastState: int;
+  tokenList: 'list[Token]';
 
 
 """
@@ -10,4 +25,18 @@ from os.path import isfile, join
 def listDirFiles(dirPath: str) -> 'list[str]': 
   onlyfiles = [f for f in listdir(dirPath) if isfile(join(dirPath, f))]
   return onlyfiles;
+
+def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, int], ResTokenList]):
+  # Lê cada linha do arquivo e passa para a função de callback on_line
+
+  response: list[Token] = [];
+  currentState: int = 0;
+
+  # Loop through each line via file handler
+  for count, line in enumerate(opened_file):
+    res = on_line(line, count + 1, currentState);
+    response = response + res.tokenList;
+    currentState = res.lastState;
+  
+  return response;
 
