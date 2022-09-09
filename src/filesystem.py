@@ -14,6 +14,9 @@ class Token(NamedTuple):
 
 class ResTokenList(NamedTuple):
   lastState: int;
+  lastStartTokenIndex: int;
+  tokenStartLine: int;
+  tokenOverflow: str;
   tokenList: 'list[Token]';
 
 
@@ -26,17 +29,23 @@ def listDirFiles(dirPath: str) -> 'list[str]':
   onlyfiles = [f for f in listdir(dirPath) if isfile(join(dirPath, f))]
   return onlyfiles;
 
-def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, int], ResTokenList]):
+def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, int, str], ResTokenList]):
   # Lê cada linha do arquivo e passa para a função de callback on_line
 
   response: list[Token] = [];
-  currentState: int = 0;
+  currentState: ResTokenList = ResTokenList(0, 0, 0, '', []);
 
   # Loop through each line via file handler
   for count, line in enumerate(opened_file):
-    res = on_line(line, count + 1, currentState);
+    if (line == ''):
+      print('Fim do arquivo')
+    res = on_line(line, count + 1, currentState.lastState, currentState.tokenOverflow);
     response = response + res.tokenList;
-    currentState = res.lastState;
+    currentState = res;
+  
+  if (currentState.lastState == 8):
+    t = Token('Bloco mal', currentState.tokenStartLine, currentState.lastStartTokenIndex, 0, currentState.tokenOverflow);
+    response.append(t);
   
   return response;
 

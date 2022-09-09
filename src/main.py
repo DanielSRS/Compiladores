@@ -9,9 +9,9 @@ LETRA = re.compile(r'/[a-zA-Z]+/g');
 DIGITO = re.compile(r'/\d/g');
 
 
-def onReadLine(line: str, lineNumber: int, initialState: int) -> ResTokenList:
+def onReadLine(line: str, lineNumber: int, initialState: int, overflow: str) -> ResTokenList:
     # Se a linha estiver vaxia não fax nada
-    tokens = findTokensInString(line, lineNumber);
+    tokens = findTokensInString(line, lineNumber, initialState, overflow);
     return tokens;
 
 # verifica se um caractere é um delimitador
@@ -29,12 +29,13 @@ def isReserved(identifier: str) -> bool:
         return True
     return False
 
-def findTokensInString(line: str, lineCount: int) -> ResTokenList:
+def findTokensInString(line: str, lineCount: int, initialState: int, overflow: str) -> ResTokenList:
   lineLength: int = len(line);
   tokenStartIndex: int = 0;
   currentIndex: int = 0;
-  currentState: int = 0;
+  currentState: int = initialState;
   tokensFoundInThisLine: list[Token] = [];
+  tokenOverflow: str = overflow;
 
   exitLoop = False;
 
@@ -60,7 +61,11 @@ def findTokensInString(line: str, lineCount: int) -> ResTokenList:
             currentIndex = currentIndex + 1;
             currentState = 0;
     elif(currentState == 2):
-        if (line[currentIndex] == '/'):
+        if (line[currentIndex] == '*'):
+            currentState = 8;
+            tokenStartIndex = currentIndex;
+            currentIndex = currentIndex + 1;
+        elif (line[currentIndex] == '/'):
             t = Token('Comentario', lineCount, currentIndex, lineLength - 1, line[currentIndex - 1: -1]);
             tokensFoundInThisLine.append(t);
             exitLoop = True;
@@ -76,24 +81,45 @@ def findTokensInString(line: str, lineCount: int) -> ResTokenList:
             t = Token('Identificador', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
+            tokenStartIndex = 0;
     elif(currentState == 6):
         if (line[currentIndex] == '"'):
             t = Token('Cadeia de caracteres', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
+            tokenStartIndex = 0;
             currentIndex = currentIndex + 1;
         elif(line[currentIndex] == '\n'):
             t = Token('string mal', lineCount, tokenStartIndex, lineLength, line[tokenStartIndex: lineLength]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            tokenStartIndex = 0;
+            currentIndex = currentIndex + 1;
+        else:
+            currentIndex = currentIndex + 1;
+    elif(currentState == 8):
+        if (line[currentIndex] == '*'):
+            currentState = 10;
+            currentIndex = currentIndex + 1;
+        elif (line[currentIndex] == '\n' or currentIndex == lineLength -1):
+            l = line.replace('\n', '');
+            if (line != '\n'):
+                tokenOverflow = tokenOverflow + l[tokenStartIndex: len(l)];
+            currentIndex = currentIndex + 1;
+        else:
+            currentIndex = currentIndex + 1;
+    elif(currentState == 10):
+        if (line[currentIndex] == '/'):
+            t = Token('Bloco', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
             currentIndex = currentIndex + 1;
         else:
             currentIndex = currentIndex + 1;
     else:
-        currentState = 0;
         exitLoop = True;
 
-  return ResTokenList(currentState, tokensFoundInThisLine);
+  return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 
 def lexico():
