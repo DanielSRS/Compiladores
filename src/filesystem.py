@@ -44,7 +44,7 @@ def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, int, 
     currentState = res;
   
   if (currentState.lastState == 8):
-    t = Token('Bloco mal', currentState.tokenStartLine, currentState.lastStartTokenIndex, 0, currentState.tokenOverflow);
+    t = Token('CoMF', currentState.tokenStartLine, currentState.lastStartTokenIndex, 0, currentState.tokenOverflow);
     response.append(t);
   
   return response;
