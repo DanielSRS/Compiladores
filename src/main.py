@@ -57,6 +57,15 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
             currentState = 6;
+        elif (line[currentIndex] == '&'):
+            currentIndex = currentIndex + 1;
+            currentState = 14;
+        elif (line[currentIndex] == '|'):
+            currentIndex = currentIndex + 1;
+            currentState = 16;
+        elif (line[currentIndex] == '!'):
+            currentIndex = currentIndex + 1;
+            currentState = 12;
         else:
             currentIndex = currentIndex + 1;
             currentState = 0;
@@ -116,9 +125,38 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentIndex = currentIndex + 1;
         else:
             currentIndex = currentIndex + 1;
+    elif(currentState == 14):
+        if (line[currentIndex] == '&'):
+            t = Token('logico', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            currentIndex = currentIndex + 1;
+        else:
+            print('caractere invalido!!')
+            currentIndex = currentIndex + 1;
+            currentState = 0;
+    elif(currentState == 16):
+        if (line[currentIndex] == '|'):
+            t = Token('logico', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            currentIndex = currentIndex + 1;
+        else:
+            print('caractere invalido!!')
+            currentIndex = currentIndex + 1;
+            currentState = 0;
+    elif(currentState == 12):
+        if (line[currentIndex] == '='):
+            print('')
+        else:
+            t = Token('logico', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
     else:
         exitLoop = True;
 
+  if (currentState != 8):
+    currentState = 0;
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 
