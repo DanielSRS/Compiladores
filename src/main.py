@@ -1,9 +1,6 @@
 import re
-from filesystem import ResTokenList, Token, readFileLines
+from filesystem import ResTokenList, Token, listDirFiles, readFileLines
 from tabulate import tabulate
-
-# Get the file handler
-fhand = open('src/entrada.txt', 'r')
 
 LETRA = re.compile(r'/[a-zA-Z]+/g');
 DIGITO = re.compile(r'/\d/g');
@@ -230,8 +227,21 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
 
 
 def lexico():
-  tokensFound: list[Token] = readFileLines(fhand, onReadLine);
-  print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
+  source_directory = 'entrada';
+  # Get the file handler
+  #fhand = open('src/entrada.txt', 'r');
+  entry_files: list[str] = listDirFiles(source_directory);
+  print(entry_files)
+
+# para cada arquivo fonte na pasta de entrada
+  for filename in entry_files:
+    filepath = source_directory + '/' + filename; # define o caminho para o arquivo
+    source_file = open(filepath, 'r'); # abre o arquivo
+    tokensFound: list[Token] = readFileLines(source_file, onReadLine); # le os arquivos e recupera os token
+
+    # salva as informaações em um arquivo
+    print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
+    print('Nexte: \n');
   return;
 
 lexico();
