@@ -1,9 +1,11 @@
 from io import TextIOWrapper
 from os import listdir
 from os.path import isfile, join
-from typing import Callable, NamedTuple, TypeVar
+from typing import Callable, NamedTuple, TypeVar, Dict
 
 T = TypeVar('T');
+
+TokenListPerFile = Dict[str, 'list[str]']
 
 class Token(NamedTuple):
   token: str;

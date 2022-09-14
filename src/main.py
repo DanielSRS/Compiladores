@@ -1,5 +1,5 @@
 import re
-from filesystem import ResTokenList, Token, listDirFiles, readFileLines
+from filesystem import ResTokenList, Token, TokenListPerFile, listDirFiles, readFileLines
 
 LETRA = re.compile(r'/[a-zA-Z]+/g');
 DIGITO = re.compile(r'/\d/g');
@@ -234,6 +234,8 @@ def lexico():
   #fhand = open('src/entrada.txt', 'r');
   entry_files: list[str] = listDirFiles(source_directory);
 
+  tokenListPerFile: TokenListPerFile = {}
+
 # para cada arquivo fonte na pasta de entrada
   for filename in entry_files:
     filepath = source_directory + '/' + filename; # define o caminho para o arquivo
@@ -242,9 +244,14 @@ def lexico():
 
     # salva as informaações em um arquivo
     #print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
+    tokenListPerFile[filename] = [];
     for token in tokensFound:
-        formatedOutput = '%02d %s %s'
-        print(formatedOutput % (token.line, token.token, token.value));
+        formatedOutput = '{0:02d} {1:s} {2:s}\n'.format(token.line, token.token, token.value);
+        #print(formatedOutput);
+        tokenListPerFile[filename].append(formatedOutput);
+
+    outputFile = open('saida/' + filename, 'w');
+    outputFile.writelines(tokenListPerFile[filename])
     source_file.close();
   return;
 
