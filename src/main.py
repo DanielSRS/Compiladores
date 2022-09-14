@@ -243,7 +243,8 @@ def lexico():
     # salva as informaações em um arquivo
     #print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
     for token in tokensFound:
-        print(str(token.line) + ' ' + token.token + ' ' + token.value);
+        formatedOutput = '%02d %s %s'
+        print(formatedOutput % (token.line, token.token, token.value));
     source_file.close();
   return;
 
