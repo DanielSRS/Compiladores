@@ -206,7 +206,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         elif (line[currentIndex] == ' '):
             currentIndex = currentIndex + 1;
         else:
-            t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
+            t = Token('ART', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
     elif(currentState == 21):
