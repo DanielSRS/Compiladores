@@ -123,7 +123,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokenStartIndex = 0;
             currentIndex = currentIndex + 1;
         elif(line[currentIndex] == '\n'):
-            t = Token('CMF', lineCount, tokenStartIndex, lineLength, line[tokenStartIndex: lineLength]);
+            t = Token('CMF', lineCount, tokenStartIndex, lineLength, line[tokenStartIndex: lineLength - 1]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
             tokenStartIndex = 0;
