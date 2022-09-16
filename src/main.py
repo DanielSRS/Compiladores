@@ -249,6 +249,9 @@ def lexico():
     filepath = source_directory + '/' + filename; # define o caminho para o arquivo
     source_file = open(filepath, 'r'); # abre o arquivo
     tokensFound: list[Token] = readFileLines(source_file, onReadLine); # le os arquivos e recupera os token
+    tokensFound.sort(key=orderTokens);
+
+    errorsNum = errorCount(tokensFound);
 
     # salva as informaações em um arquivo
     #print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
@@ -257,6 +260,9 @@ def lexico():
         formatedOutput = '{0:02d} {1:s} {2:s}\n'.format(token.line, token.token, token.value);
         #print(formatedOutput);
         tokenListPerFile[filename].append(formatedOutput);
+
+    tokenListPerFile[filename].insert(-errorsNum, '\n');
+    tokenListPerFile[filename][-1] = tokenListPerFile[filename][-1][0:-2]; # temove quebra de linha do ultimo item
 
     outputFile = open('saida/' + filename, 'w');
     outputFile.writelines(tokenListPerFile[filename])
