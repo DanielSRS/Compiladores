@@ -87,7 +87,14 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
             currentState = 21;
+        elif(line[currentIndex] == ' ' or line[currentIndex] == '\t' or line[currentIndex] == '\n'):
+            currentIndex = currentIndex + 1;
+            currentState = 0;
         else:
+            mlkmk = line[currentIndex];
+            t = Token('TMF', lineCount, currentIndex -1, currentIndex, mlkmk);
+            #print(line[currentIndex - 1] + ' ' + mlkmk + ' ' + line[currentIndex + 1])
+            tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
             currentState = 0;
     elif(currentState == 2):
