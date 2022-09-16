@@ -157,6 +157,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
             currentIndex = currentIndex + 1;
         else:
+            currentState = 8;
             currentIndex = currentIndex + 1;
     elif(currentState == 14):
         if (line[currentIndex] == '&'):
