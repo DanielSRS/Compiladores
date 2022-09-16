@@ -236,6 +236,25 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 
+def isError(err: str):
+    errors = {'CMF', 'CoMF', 'NMF', 'IMF', 'TMF'}
+    if err in errors:
+        return True;
+    return False
+
+def orderTokens(tk: Token):
+    if (isError(tk.token)):
+        return 1;
+    return 0;
+
+def errorCount(tk: 'list[Token]'):
+    ec = 0
+    for t in tk:
+        if (isError(t.token)):
+            ec = ec + 1;
+    return ec;
+
+
 def lexico():
   source_directory = 'entrada';
   # Get the file handler
