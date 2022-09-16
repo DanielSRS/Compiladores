@@ -114,6 +114,14 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
             currentIndex = currentIndex + 1;
     elif(currentState == 5):
+        if(currentIndex + 1 >= lineLength):
+            if (isReserved(line[tokenStartIndex: currentIndex])):
+                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex:]);
+            else:
+                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex:]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+            tokenStartIndex = 0;
         if (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         else:
