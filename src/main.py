@@ -97,7 +97,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '/'):
             t = Token('COM', lineCount, currentIndex, lineLength - 1, line[currentIndex - 1: -1]);
-            tokensFoundInThisLine.append(t);
+            #tokensFoundInThisLine.append(t);
             exitLoop = True;
             currentIndex = lineLength - 1;
             currentState = 0;
@@ -146,7 +146,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
     elif(currentState == 10):
         if (line[currentIndex] == '/'):
             t = Token('COM', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
-            tokensFoundInThisLine.append(t);
+            #tokensFoundInThisLine.append(t);
             currentState = 0;
             currentIndex = currentIndex + 1;
         else:
