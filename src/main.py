@@ -92,8 +92,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
         else:
             mlkmk = line[currentIndex];
-            t = Token('TMF', lineCount, currentIndex -1, currentIndex, mlkmk);
-            #print(line[currentIndex - 1] + ' ' + mlkmk + ' ' + line[currentIndex + 1])
+            t = Token('TMF', lineCount, currentIndex, currentIndex, mlkmk);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
             currentState = 0;
@@ -289,7 +288,9 @@ def lexico():
         tokenListPerFile[filename].append(formatedOutput);
 
     tokenListPerFile[filename].insert(-errorsNum, '\n');
-    tokenListPerFile[filename][-1] = tokenListPerFile[filename][-1][0:-2]; # temove quebra de linha do ultimo item
+    lastTokenString = tokenListPerFile[filename][-1];
+    if (lastTokenString[len(lastTokenString) - 1] == '\n'):
+        tokenListPerFile[filename][-1] = tokenListPerFile[filename][-1][0:len(lastTokenString) - 1]; # temove quebra de linha do ultimo item
 
     outputFile = open('saida/' + filename, 'w');
     outputFile.writelines(tokenListPerFile[filename])
