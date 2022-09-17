@@ -227,9 +227,25 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokensFoundInThisLine.append(t);
             currentState = 0;
     elif(currentState == 21):
-        if (re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
+        if (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '.'):
+            currentState = 22;
+            currentIndex = currentIndex + 1;
+        else:
+            t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+    elif(currentState == 22):
+        if (re.match(r'\d', line[currentIndex])):
+            currentIndex = currentIndex + 1;
+            currentState = 23;
+        else:
+            t = Token('NMF', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+    elif(currentState == 23):
+        if (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         else:
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
