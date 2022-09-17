@@ -121,7 +121,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokensFoundInThisLine.append(t);
             currentState = 0;
             tokenStartIndex = 0;
-        if (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
+        elif (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         else:
             if (isReserved(line[tokenStartIndex: currentIndex])):
@@ -206,7 +206,6 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             t = Token('REL', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = 0;
-            currentIndex = currentIndex + 1;
     elif(currentState == 19):
         if (line[currentIndex] == '+'):
             t = Token('ART', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
@@ -227,7 +226,14 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokensFoundInThisLine.append(t);
             currentState = 0;
     elif(currentState == 21):
-        if (re.match(r'\d', line[currentIndex])):
+        if(currentIndex + 1 >= lineLength):
+            l = line[tokenStartIndex:]
+            if (l[len(l) - 1] == '\n'):
+                l = l[ :- 2]
+            t = Token('NRO', lineCount, tokenStartIndex, currentIndex, l);
+            tokensFoundInThisLine.append(t);
+            currentIndex = currentIndex + 1;
+        elif (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '.'):
             currentState = 22;
@@ -235,7 +241,10 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         else:
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            if (line[currentIndex] == ' ' or line[currentIndex] == '-' or line[currentIndex] == '\t'):
+                currentState = 24;
+            else:
+                currentState = 0;
     elif(currentState == 22):
         if (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
@@ -250,6 +259,25 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         else:
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
+            currentState = 0;
+    elif(currentState == 24):
+        if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
+            currentIndex = currentIndex + 1;
+        elif (line[currentIndex] == '-'):
+            tokenStartIndex = currentIndex;
+            currentIndex = currentIndex + 1;
+            currentState = 25;
+        else:
+            currentState = 0;
+    elif(currentState == 25):
+        if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
+            currentIndex = currentIndex + 1;
+        elif (re.match(r'\d', line[currentIndex])):
+            t = Token('ART', lineCount, tokenStartIndex, tokenStartIndex + 1, line[tokenStartIndex: tokenStartIndex + 1]);
+            tokensFoundInThisLine.append(t);
+            currentState = 0;
+        else:
+            currentIndex = tokenStartIndex;
             currentState = 0;
     else:
         exitLoop = True;
