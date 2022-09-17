@@ -25,6 +25,15 @@ def isReserved(identifier: str) -> bool:
         return True
     return False
 
+def hasNonASCII(s: str):
+    count = 0;
+    for char in s:
+        if (ord(char) < 32 or ord(char) > 126):
+            count = count + 1;
+    if (count > 0):
+        return True;
+    return False
+
 def findTokensInString(line: str, lineCount: int, initialState: int, overflow: str) -> ResTokenList:
   lineLength: int = len(line);
   tokenStartIndex: int = 0;
@@ -133,7 +142,11 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             tokenStartIndex = 0;
     elif(currentState == 6):
         if (line[currentIndex] == '"'):
-            t = Token('CAC', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex + 1]);
+            stoken = line[tokenStartIndex: currentIndex + 1];
+            if (hasNonASCII(stoken)):
+                t = Token('CMF', lineCount, tokenStartIndex, currentIndex, stoken);
+            else:
+                t = Token('CAC', lineCount, tokenStartIndex, currentIndex, stoken);
             tokensFoundInThisLine.append(t);
             currentState = 0;
             tokenStartIndex = 0;
@@ -173,7 +186,8 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
             currentIndex = currentIndex + 1;
         else:
-            print('caractere invalido!!')
+            t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
+            tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
             currentState = 0;
     elif(currentState == 16):
@@ -183,7 +197,8 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentState = 0;
             currentIndex = currentIndex + 1;
         else:
-            print('caractere invalido!!')
+            t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
+            tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
             currentState = 0;
     elif(currentState == 12):
