@@ -57,7 +57,17 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         elif (re.match( r'[a-zA-Z]+', line[currentIndex])):
             currentState = 5;
             tokenStartIndex = currentIndex;
-            currentIndex = currentIndex + 1;
+            if(currentIndex + 1 >= lineLength):
+                atEndOfLine = line[tokenStartIndex:]
+                if (isReserved(line[tokenStartIndex: currentIndex])):
+                    t = Token('PRE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
+                else:
+                    t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
+                tokensFoundInThisLine.append(t);
+                currentState = 0;
+                currentIndex = currentIndex + 1;
+            else:
+                currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '"'):
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
@@ -123,20 +133,22 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentIndex = currentIndex + 1;
     elif(currentState == 5):
         if(currentIndex + 1 >= lineLength):
+            atEndOfLine = line[tokenStartIndex:]
             if (isReserved(line[tokenStartIndex: currentIndex])):
-                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex:]);
+                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
             else:
-                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex:]);
+                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
             tokensFoundInThisLine.append(t);
             currentState = 0;
             tokenStartIndex = 0;
         elif (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         else:
+            ideToken = line[tokenStartIndex: currentIndex]
             if (isReserved(line[tokenStartIndex: currentIndex])):
-                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
+                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, ideToken);
             else:
-                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
+                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, ideToken);
             tokensFoundInThisLine.append(t);
             currentState = 0;
             tokenStartIndex = 0;
