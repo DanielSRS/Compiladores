@@ -244,7 +244,8 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         if(currentIndex + 1 >= lineLength):
             l = line[tokenStartIndex:]
             if (l[len(l) - 1] == '\n'):
-                l = l[ :- 2]
+                l = l
+                #l = l[ :- 1]
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, l);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
