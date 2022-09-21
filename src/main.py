@@ -367,6 +367,7 @@ def lexico():
     outputFile = open('saida/' + filename, 'w');
     outputFile.writelines(tokenListPerFile[filename])
     source_file.close();
+    outputFile.close();
   return;
 
 lexico();
