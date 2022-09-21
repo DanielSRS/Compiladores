@@ -355,11 +355,14 @@ def lexico():
     #print(tabulate(tokensFound, headers=['token', 'line', 'tokeStartIndex', 'tokenEndIndex', 'value']));
     tokenListPerFile[filename] = [];
     for token in tokensFound:
-        formatedOutput = '{0:02d} {1:s} {2:s}\n'.format(token.line, token.token, token.value);
+        formatedOutput = '{0:02d} {1:s} {2:s}\n'.format(token.line, token.token, token.value.replace('\n', ''));
         #print(formatedOutput);
         tokenListPerFile[filename].append(formatedOutput);
 
-    tokenListPerFile[filename].insert(-errorsNum, '\n');
+    if(errorsNum > 0):
+        # Se houver erros, adiciona uma quebra de linha antes da lista de erros
+        tokenListPerFile[filename].insert(-errorsNum, '\n');
+
     lastTokenString = tokenListPerFile[filename][-1];
     if (lastTokenString[len(lastTokenString) - 1] == '\n'):
         tokenListPerFile[filename][-1] = tokenListPerFile[filename][-1][0:len(lastTokenString) - 1]; # temove quebra de linha do ultimo item
