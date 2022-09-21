@@ -40,7 +40,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
   currentIndex: int = 0;
   currentState: int = initialState;
   tokensFoundInThisLine: list[Token] = [];
-  tokenOverflow: str = overflow;
+  tokenOverflow: str = overflow if initialState == 8 else '';
 
   exitLoop = False;
 
