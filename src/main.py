@@ -94,7 +94,16 @@ def LogicalOperatorAutomata(state: str, input: str):
         return 'LogicalOperatorFinal'
     if (state == 'PossibleLogical!' and not input == '='):
         return 'LogicalOperatorFinal'
+    if (state == 'PossibleLogical!' and input == '='):
+        return 'RelationalOperatorFinal'
     return 'MalformedToken';
+
+def RelationalOperatorAutomata(state: str, input: str):
+    if (state == 'Relational' and input == '='):
+        return 'DoubleRelationalOperator'
+    if (state == 'DoubleRelationalOperator'):
+        return 'RelationalOperatorFinal'
+    return 'RelationalOperatorFinal';
 
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
@@ -114,6 +123,8 @@ def getNextState(state: str, input: str) -> str:
         return 'PossibleLogical||';
     elif (input == '!'):
         return 'PossibleLogical!';
+    elif (input == '=' or input == '<' or input == '>'):
+        return 'Relational';
     return '0';
 
 def isFinalState(state: str):
@@ -141,6 +152,7 @@ def getTokenType(state: str):
         'ArithmeticFinal': 'ART',
         'LogicalOperatorFinal': 'LOG',
         'MalformedToken': 'TMF',
+        'RelationalOperatorFinal': 'REL',
     }
     return stateToTokenType.get(state, 'None');
 
@@ -158,6 +170,8 @@ def findApropriateAutomata(state: str) -> Automata:
         return CommentAutomata;
     elif ('Logical' in state):
         return LogicalOperatorAutomata;
+    elif ('Relational' in state):
+        return RelationalOperatorAutomata;
     return ErrorAutomata;
 
 def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
@@ -214,10 +228,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentIndex = currentIndex + 1;
 
     if (currentState == '0'):
-        if (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
-            currentIndex = currentIndex + 1;
-            currentState = '18';
-        elif (line[currentIndex] == '+'):
+        if (line[currentIndex] == '+'):
             currentIndex = currentIndex + 1;
             currentState = '19';
         elif (line[currentIndex] == '*'):
@@ -249,22 +260,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             currentIndex = currentIndex + 1;
             currentState = '0';
 
-    elif(currentState == '12'):
-        if (line[currentIndex] == '='):
-            t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-    elif(currentState == '18'):
-        if (line[currentIndex] == '='):
-            t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('REL', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
+
     elif(currentState == '19'):
         if (line[currentIndex] == '+'):
             t = Token('ART', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
