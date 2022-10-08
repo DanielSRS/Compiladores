@@ -1,0 +1,11 @@
+# Ignora os aquivos de entrada
+entrada
+
+# Ignora os arquivos de saída
+saida
+
+# ignora saidas de referencia
+saidas_dos_testes
+
+# arquivos de cache do python
+src/__pycache__
