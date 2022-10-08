@@ -1,4 +1,5 @@
 import re
+from typing import Callable
 from filesystem import ResTokenList, Token, TokenListPerFile, listDirFiles, readFileLines
 
 LETRA = re.compile(r'/[a-zA-Z]+/g');
@@ -34,6 +35,67 @@ def hasNonASCII(s: str):
         return True;
     return False
 
+Automata = Callable[[str, str], str];
+
+def IdendifierAutomata(state: str, input: str):
+    isValid = re.match(r'[a-zA-Z]+', input) or re.match(r'\d', input);
+    if (state == 'IdentifierFinal'):
+        return 'IdentifierFinal';
+    if (state == 'Identifier' and isValid):
+        return 'Identifier'
+    elif (state == 'Identifier' and not isValid):
+        return 'IdentifierFinal'
+    return state + 'Error:_' + input;
+
+def DelimiterAutomata(state: str, input: str):
+    if (state == 'DelimiterFinal'):
+        return 'DelimiterFinal';
+    if (state == 'Delimiter'):
+        return 'DelimiterFinal';
+    return state + 'Error:_' + input;
+
+def ErrorAutomata(state: str, input: str):
+    return state + 'Error:_' + input;
+
+def getNextState(state: str, input: str) -> str:
+    if (not state == 'InitialState'):
+        automata: Automata = findApropriateAutomata(state);
+        return automata(state, input);
+    if (input == '/'):
+        return 'PossibleComment';
+    elif (isDelimiter(input)):
+        return 'Delimiter'
+    elif (re.match( r'[a-zA-Z]+', input)):      # Se for uma letra
+        return 'Identifier'
+    return '0';
+
+def isFinalState(state: str):
+    finalStates = {'DelimiterFinal'};
+    if state in finalStates:
+        return True;
+    return False;
+
+def getTokenType(state: str):
+    stateToTokenType = {
+        'Delimiter': 'DEL',
+    }
+    return stateToTokenType.get(state, 'None');
+
+def findApropriateAutomata(state: str) -> Automata:
+    if (state == 'Identifier'):
+        return IdendifierAutomata;
+    elif (state == 'Delimiter'):
+        return DelimiterAutomata;
+    return ErrorAutomata;
+
+def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
+    tokenType = getTokenType(state);
+    tokenText = lineText[tokenStartIndex:tokenEndIndex];
+    if (tokenType == 'IDE'):
+        tokenType = 'PRE' if isReserved(tokenText) else 'IDE';
+    return Token(tokenType, lineNumber, tokenStartIndex, tokenEndIndex, tokenText);
+
+
 def findTokensInString(line: str, lineCount: int, initialState: str, overflow: str) -> ResTokenList:
   lineLength: int = len(line);
   tokenStartIndex: int = 0;
@@ -45,30 +107,34 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
   exitLoop = False;
 
   while (not exitLoop and currentIndex < lineLength):
+    # Se ainda no estado inicial, considere o caractere atual como inicio do token
+    if (currentState == 'InitialState'):
+        tokenStartIndex = currentIndex;
+    
+    # Caractere atual
+    character: str = line[currentIndex];
+
+    # Proximo estado, dado o caractere lido
+    nextState: str = getNextState(currentState, character);
+
+    # Se for um estado final, gere um token
+    if (isFinalState(nextState)):
+        token = generateToken(currentState, lineCount, line, tokenStartIndex, currentIndex);
+        tokensFoundInThisLine.append(token);    # Apos salvar o token
+        currentState = 'InitialState';          # Volte para o estado inicial
+    
+    # Do contrario, leia o proximo caractere
+    else:
+        # Se a linha termina e o estado não é final, decrementa o index
+        # para chegar num estado final na proxima iteração
+        if (currentIndex + 1 >= lineLength):
+            currentIndex = currentIndex - 1;
+
+        currentState = nextState            # Define o priximo estado
+        currentIndex = currentIndex + 1;
+
     if (currentState == '0'):
-        if (line[currentIndex] == '/'):
-            currentIndex = currentIndex + 1;
-            currentState = '2';
-        elif (isDelimiter(line[currentIndex])):
-            t = Token('DEL', lineCount, currentIndex, currentIndex + 1, line[currentIndex:currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        elif (re.match( r'[a-zA-Z]+', line[currentIndex])):
-            currentState = '5';
-            tokenStartIndex = currentIndex;
-            if(currentIndex + 1 >= lineLength):
-                atEndOfLine = line[tokenStartIndex:]
-                if (isReserved(line[tokenStartIndex: currentIndex])):
-                    t = Token('PRE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
-                else:
-                    t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
-                tokensFoundInThisLine.append(t);
-                currentState = '0';
-                currentIndex = currentIndex + 1;
-            else:
-                currentIndex = currentIndex + 1;
-        elif (line[currentIndex] == '"'):
+        if (line[currentIndex] == '"'):
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
             currentState = '6';
