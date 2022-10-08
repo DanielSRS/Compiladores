@@ -92,6 +92,8 @@ def LogicalOperatorAutomata(state: str, input: str):
         return 'LogicalOperatorFinal'
     if (state == 'PossibleLogical||' and input == '|'):
         return 'LogicalOperatorFinal'
+    if (state == 'PossibleLogical!' and not input == '='):
+        return 'LogicalOperatorFinal'
     return 'MalformedToken';
 
 def getNextState(state: str, input: str) -> str:
@@ -110,6 +112,8 @@ def getNextState(state: str, input: str) -> str:
         return 'PossibleLogical&&';
     elif (input == '|'):
         return 'PossibleLogical||';
+    elif (input == '!'):
+        return 'PossibleLogical!';
     return '0';
 
 def isFinalState(state: str):
@@ -210,10 +214,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentIndex = currentIndex + 1;
 
     if (currentState == '0'):
-        if (line[currentIndex] == '!'):
-            currentIndex = currentIndex + 1;
-            currentState = '12';
-        elif (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
+        if (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
             currentIndex = currentIndex + 1;
             currentState = '18';
         elif (line[currentIndex] == '+'):
@@ -254,10 +255,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             tokensFoundInThisLine.append(t);
             currentState = '0';
             currentIndex = currentIndex + 1;
-        else:
-            t = Token('LOG', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
     elif(currentState == '18'):
         if (line[currentIndex] == '='):
             t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
