@@ -87,6 +87,13 @@ def CommentAutomata(state: str, input: str):
         return 'BlockComment'
     return state + 'Error:_' + input;
 
+def LogicalOperatorAutomata(state: str, input: str):
+    if (state == 'PossibleLogical&&' and input == '&'):
+        return 'LogicalOperatorFinal'
+    if (state == 'PossibleLogical||' and input == '|'):
+        return 'LogicalOperatorFinal'
+    return 'MalformedToken';
+
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
         automata: Automata = findApropriateAutomata(state);
@@ -99,6 +106,10 @@ def getNextState(state: str, input: str) -> str:
         return 'Identifier'
     elif (input == '"'):
         return 'String';
+    elif (input == '&'):
+        return 'PossibleLogical&&';
+    elif (input == '|'):
+        return 'PossibleLogical||';
     return '0';
 
 def isFinalState(state: str):
@@ -109,6 +120,8 @@ def isFinalState(state: str):
         'LineCommentFinal',
         'BlockCommentFinal',
         'ArithmeticFinal',
+        'LogicalOperatorFinal',
+        'MalformedToken',
     };
     if state in finalStates:
         return True;
@@ -121,7 +134,9 @@ def getTokenType(state: str):
         'StringFinal': 'CAC',
         'LineCommentFinal': 'COM',
         'BlockCommentFinal': 'CMB',
-        'ArithmeticFinal': 'ART'
+        'ArithmeticFinal': 'ART',
+        'LogicalOperatorFinal': 'LOG',
+        'MalformedToken': 'TMF',
     }
     return stateToTokenType.get(state, 'None');
 
@@ -137,6 +152,8 @@ def findApropriateAutomata(state: str) -> Automata:
         return StringAutomata;
     elif ('Comment' in state):
         return CommentAutomata;
+    elif ('Logical' in state):
+        return LogicalOperatorAutomata;
     return ErrorAutomata;
 
 def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
@@ -193,13 +210,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentIndex = currentIndex + 1;
 
     if (currentState == '0'):
-        if (line[currentIndex] == '&'):
-            currentIndex = currentIndex + 1;
-            currentState = '14';
-        elif (line[currentIndex] == '|'):
-            currentIndex = currentIndex + 1;
-            currentState = '16';
-        elif (line[currentIndex] == '!'):
+        if (line[currentIndex] == '!'):
             currentIndex = currentIndex + 1;
             currentState = '12';
         elif (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
@@ -237,28 +248,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             currentIndex = currentIndex + 1;
             currentState = '0';
 
-    elif(currentState == '14'):
-        if (line[currentIndex] == '&'):
-            t = Token('LOG', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentIndex = currentIndex + 1;
-            currentState = '0';
-    elif(currentState == '16'):
-        if (line[currentIndex] == '|'):
-            t = Token('LOG', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentIndex = currentIndex + 1;
-            currentState = '0';
     elif(currentState == '12'):
         if (line[currentIndex] == '='):
             t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
