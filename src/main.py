@@ -105,6 +105,15 @@ def RelationalOperatorAutomata(state: str, input: str):
         return 'RelationalOperatorFinal'
     return 'RelationalOperatorFinal';
 
+def ArithmeticOperatorAutomata(state: str, input: str):
+    if (state == 'Arithmetic' and input == '+'):
+        return 'DoubleArithmeticOperator'
+    if (state == 'DoubleArithmeticOperator'):
+        return 'ArithmeticOperatorFinal'
+    if (state == 'Arithmetic*'):
+        return 'ArithmeticOperatorFinal'
+    return 'ArithmeticOperatorFinal';
+
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
         automata: Automata = findApropriateAutomata(state);
@@ -125,6 +134,10 @@ def getNextState(state: str, input: str) -> str:
         return 'PossibleLogical!';
     elif (input == '=' or input == '<' or input == '>'):
         return 'Relational';
+    elif (input == '+'):
+        return 'Arithmetic';
+    elif (input == '*'):
+        return 'Arithmetic*';
     return '0';
 
 def isFinalState(state: str):
@@ -172,6 +185,8 @@ def findApropriateAutomata(state: str) -> Automata:
         return LogicalOperatorAutomata;
     elif ('Relational' in state):
         return RelationalOperatorAutomata;
+    elif ('Arithmetic' in state):
+        return ArithmeticOperatorAutomata;
     return ErrorAutomata;
 
 def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
@@ -228,15 +243,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentIndex = currentIndex + 1;
 
     if (currentState == '0'):
-        if (line[currentIndex] == '+'):
-            currentIndex = currentIndex + 1;
-            currentState = '19';
-        elif (line[currentIndex] == '*'):
-            t = Token('ART', lineCount, currentIndex, currentIndex + 1, line[currentIndex:currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentIndex = currentIndex + 1;
-            currentState = '0';
-        elif (line[currentIndex] == '-'):
+        if (line[currentIndex] == '-'):
             if (line[currentIndex + 1] == '-'):
                 t = Token('ART', lineCount, currentIndex, currentIndex + 2, line[currentIndex:currentIndex + 2]);
                 tokensFoundInThisLine.append(t);
@@ -260,17 +267,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             currentIndex = currentIndex + 1;
             currentState = '0';
 
-
-    elif(currentState == '19'):
-        if (line[currentIndex] == '+'):
-            t = Token('ART', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
     elif(currentState == '20'):
         if (re.match(r'\d', line[currentIndex])):
             currentState = '21';
