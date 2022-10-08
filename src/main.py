@@ -64,6 +64,23 @@ def StringAutomata(state: str, input: str):
         return 'MalformedString';
     return 'String';
 
+def CommentAutomata(state: str, input: str):
+    if (state == 'PossibleComment' and not (input == '*' or input == '/')):
+        return 'ArithmeticFinal'
+    if (state == 'PossibleComment' and input == '*'):
+        return 'BlockComment'
+    if (state == 'PossibleComment' and input == '/'):
+        return 'LineComment'
+    if (state == 'LineComment' and input == '\n'):
+        return 'LineCommentFinal'
+    if (state == 'BlockComment' and input == '\n'):
+        return 'BlockCommentOverflow'
+    if (state == 'LineComment'):
+        return 'LineComment'
+    if (state == 'BlockComment'):
+        return 'BlockComment'
+    return state + 'Error:_' + input;
+
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
         automata: Automata = findApropriateAutomata(state);
@@ -79,7 +96,14 @@ def getNextState(state: str, input: str) -> str:
     return '0';
 
 def isFinalState(state: str):
-    finalStates = {'DelimiterFinal', 'MalformedString', 'StringFinal'};
+    finalStates = {
+        'DelimiterFinal',
+        'MalformedString',
+        'StringFinal',
+        'LineCommentFinal',
+        'BlockCommentFinal',
+        'ArithmeticFinal',
+    };
     if state in finalStates:
         return True;
     return False;
@@ -89,14 +113,24 @@ def getTokenType(state: str):
         'DelimiterFinal': 'DEL',
         'MalformedString': 'CMF',
         'StringFinal': 'CAC',
+        'LineCommentFinal': 'COM',
+        'BlockCommentFinal': 'CMB',
+        'ArithmeticFinal': 'ART'
     }
     return stateToTokenType.get(state, 'None');
 
+def toFinalState(state: str):
+    return state + 'Final';
+
 def findApropriateAutomata(state: str) -> Automata:
-    if (state == 'Identifier'):
+    if ('Identifier' in state):
         return IdendifierAutomata;
-    elif (state == 'Delimiter'):
+    elif ('Delimiter' in state):
         return DelimiterAutomata;
+    elif ('String' in state):
+        return StringAutomata;
+    elif ('Comment' in state):
+        return CommentAutomata;
     return ErrorAutomata;
 
 def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
@@ -141,6 +175,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         # Se a linha termina e o estado não é final, decrementa o index
         # para chegar num estado final na proxima iteração
         if (currentIndex + 1 >= lineLength):
+            nextState = toFinalState(nextState);    # Define o estado como final
             currentIndex = currentIndex - 1;
 
         currentState = nextState            # Define o priximo estado
@@ -190,22 +225,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
             currentState = '0';
-    elif(currentState == '2'):
-        if (line[currentIndex] == '*'):
-            currentState = '8';
-            tokenStartIndex = currentIndex - 1; # considerando a barra anterior
-            currentIndex = currentIndex + 1;
-        elif (line[currentIndex] == '/'):
-            t = Token('COM', lineCount, currentIndex, lineLength - 1, line[currentIndex - 1: -1]);
-            #tokensFoundInThisLine.append(t);
-            exitLoop = True;
-            currentIndex = lineLength - 1;
-            currentState = '0';
-        else:
-            t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex - 1: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
+
     elif(currentState == '8'):
         if (line[currentIndex] == '*'):
             currentState = '10';
