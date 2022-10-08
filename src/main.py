@@ -77,6 +77,12 @@ def CommentAutomata(state: str, input: str):
         return 'BlockCommentOverflow'
     if (state == 'LineComment'):
         return 'LineComment'
+    if (state == 'BlockComment' and input == '*'):
+        return 'ClosingBlockComment'
+    if (state == 'ClosingBlockComment' and input == '/'):
+        return 'BlockCommentFinal'
+    if (state == 'ClosingBlockComment' and not input == '/'):
+        return 'BlockComment'
     if (state == 'BlockComment'):
         return 'BlockComment'
     return state + 'Error:_' + input;
@@ -178,6 +184,11 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             nextState = toFinalState(nextState);    # Define o estado como final
             currentIndex = currentIndex - 1;
 
+        # Se há um comentario de bloco multilinha
+        if (currentState == 'BlockCommentOverflow'):
+            tokenOverflow = line[tokenStartIndex:].replace('\n', '');
+            exitLoop = True;
+
         currentState = nextState            # Define o priximo estado
         currentIndex = currentIndex + 1;
 
@@ -226,26 +237,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             currentIndex = currentIndex + 1;
             currentState = '0';
 
-    elif(currentState == '8'):
-        if (line[currentIndex] == '*'):
-            currentState = '10';
-            currentIndex = currentIndex + 1;
-        elif (line[currentIndex] == '\n' or currentIndex == lineLength -1):
-            l = line.replace('\n', '');
-            if (line != '\n'):
-                tokenOverflow = tokenOverflow + l[tokenStartIndex: len(l)];
-            currentIndex = currentIndex + 1;
-        else:
-            currentIndex = currentIndex + 1;
-    elif(currentState == '10'):
-        if (line[currentIndex] == '/'):
-            t = Token('COM', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
-            #tokensFoundInThisLine.append(t);
-            currentState = '0';
-            currentIndex = currentIndex + 1;
-        else:
-            currentState = '8';
-            currentIndex = currentIndex + 1;
     elif(currentState == '14'):
         if (line[currentIndex] == '&'):
             t = Token('LOG', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
