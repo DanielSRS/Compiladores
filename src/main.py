@@ -57,6 +57,13 @@ def DelimiterAutomata(state: str, input: str):
 def ErrorAutomata(state: str, input: str):
     return state + 'Error:_' + input;
 
+def StringAutomata(state: str, input: str):
+    if (state == 'String' and input == '"'):
+        return 'StringFinal';
+    if (state == 'String' and input == '\n'):
+        return 'MalformedString';
+    return 'String';
+
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
         automata: Automata = findApropriateAutomata(state);
@@ -67,17 +74,21 @@ def getNextState(state: str, input: str) -> str:
         return 'Delimiter'
     elif (re.match( r'[a-zA-Z]+', input)):      # Se for uma letra
         return 'Identifier'
+    elif (input == '"'):
+        return 'String';
     return '0';
 
 def isFinalState(state: str):
-    finalStates = {'DelimiterFinal'};
+    finalStates = {'DelimiterFinal', 'MalformedString', 'StringFinal'};
     if state in finalStates:
         return True;
     return False;
 
 def getTokenType(state: str):
     stateToTokenType = {
-        'Delimiter': 'DEL',
+        'DelimiterFinal': 'DEL',
+        'MalformedString': 'CMF',
+        'StringFinal': 'CAC',
     }
     return stateToTokenType.get(state, 'None');
 
@@ -93,6 +104,8 @@ def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: i
     tokenText = lineText[tokenStartIndex:tokenEndIndex];
     if (tokenType == 'IDE'):
         tokenType = 'PRE' if isReserved(tokenText) else 'IDE';
+    if (tokenType == 'CAC'):
+        tokenType = 'CMF' if hasNonASCII(tokenText) else 'CAC';
     return Token(tokenType, lineNumber, tokenStartIndex, tokenEndIndex, tokenText);
 
 
@@ -134,11 +147,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentIndex = currentIndex + 1;
 
     if (currentState == '0'):
-        if (line[currentIndex] == '"'):
-            tokenStartIndex = currentIndex;
-            currentIndex = currentIndex + 1;
-            currentState = '6';
-        elif (line[currentIndex] == '&'):
+        if (line[currentIndex] == '&'):
             currentIndex = currentIndex + 1;
             currentState = '14';
         elif (line[currentIndex] == '|'):
@@ -196,46 +205,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex - 1: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentState = '0';
-            currentIndex = currentIndex + 1;
-    elif(currentState == '5'):
-        if(currentIndex + 1 >= lineLength):
-            atEndOfLine = line[tokenStartIndex:]
-            if (isReserved(line[tokenStartIndex: currentIndex])):
-                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
-            else:
-                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            tokenStartIndex = 0;
-        elif (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
-            currentIndex = currentIndex + 1;
-        else:
-            ideToken = line[tokenStartIndex: currentIndex]
-            if (isReserved(line[tokenStartIndex: currentIndex])):
-                t = Token('PRE', lineCount, tokenStartIndex, currentIndex, ideToken);
-            else:
-                t = Token('IDE', lineCount, tokenStartIndex, currentIndex, ideToken);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            tokenStartIndex = 0;
-    elif(currentState == '6'):
-        if (line[currentIndex] == '"'):
-            stoken = line[tokenStartIndex: currentIndex + 1];
-            if (hasNonASCII(stoken)):
-                t = Token('CMF', lineCount, tokenStartIndex, currentIndex, stoken);
-            else:
-                t = Token('CAC', lineCount, tokenStartIndex, currentIndex, stoken);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            tokenStartIndex = 0;
-            currentIndex = currentIndex + 1;
-        elif(line[currentIndex] == '\n'):
-            t = Token('CMF', lineCount, tokenStartIndex, lineLength, line[tokenStartIndex: lineLength - 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-            tokenStartIndex = 0;
-            currentIndex = currentIndex + 1;
-        else:
             currentIndex = currentIndex + 1;
     elif(currentState == '8'):
         if (line[currentIndex] == '*'):
