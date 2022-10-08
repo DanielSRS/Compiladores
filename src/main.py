@@ -5,7 +5,7 @@ LETRA = re.compile(r'/[a-zA-Z]+/g');
 DIGITO = re.compile(r'/\d/g');
 
 
-def onReadLine(line: str, lineNumber: int, initialState: int, overflow: str) -> ResTokenList:
+def onReadLine(line: str, lineNumber: int, initialState: str, overflow: str) -> ResTokenList:
     # Se a linha estiver vaxia não fax nada
     tokens = findTokensInString(line, lineNumber, initialState, overflow);
     return tokens;
@@ -34,28 +34,28 @@ def hasNonASCII(s: str):
         return True;
     return False
 
-def findTokensInString(line: str, lineCount: int, initialState: int, overflow: str) -> ResTokenList:
+def findTokensInString(line: str, lineCount: int, initialState: str, overflow: str) -> ResTokenList:
   lineLength: int = len(line);
   tokenStartIndex: int = 0;
   currentIndex: int = 0;
-  currentState: int = initialState;
+  currentState: str = initialState;
   tokensFoundInThisLine: list[Token] = [];
-  tokenOverflow: str = overflow if initialState == 8 else '';
+  tokenOverflow: str = overflow if initialState == '8' else '';
 
   exitLoop = False;
 
   while (not exitLoop and currentIndex < lineLength):
-    if (currentState == 0):
+    if (currentState == '0'):
         if (line[currentIndex] == '/'):
             currentIndex = currentIndex + 1;
-            currentState = 2;
+            currentState = '2';
         elif (isDelimiter(line[currentIndex])):
             t = Token('DEL', lineCount, currentIndex, currentIndex + 1, line[currentIndex:currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         elif (re.match( r'[a-zA-Z]+', line[currentIndex])):
-            currentState = 5;
+            currentState = '5';
             tokenStartIndex = currentIndex;
             if(currentIndex + 1 >= lineLength):
                 atEndOfLine = line[tokenStartIndex:]
@@ -64,60 +64,60 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
                 else:
                     t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
                 tokensFoundInThisLine.append(t);
-                currentState = 0;
+                currentState = '0';
                 currentIndex = currentIndex + 1;
             else:
                 currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '"'):
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
-            currentState = 6;
+            currentState = '6';
         elif (line[currentIndex] == '&'):
             currentIndex = currentIndex + 1;
-            currentState = 14;
+            currentState = '14';
         elif (line[currentIndex] == '|'):
             currentIndex = currentIndex + 1;
-            currentState = 16;
+            currentState = '16';
         elif (line[currentIndex] == '!'):
             currentIndex = currentIndex + 1;
-            currentState = 12;
+            currentState = '12';
         elif (line[currentIndex] == '=' or line[currentIndex] == '<' or line[currentIndex] == '>'):
             currentIndex = currentIndex + 1;
-            currentState = 18;
+            currentState = '18';
         elif (line[currentIndex] == '+'):
             currentIndex = currentIndex + 1;
-            currentState = 19;
+            currentState = '19';
         elif (line[currentIndex] == '*'):
             t = Token('ART', lineCount, currentIndex, currentIndex + 1, line[currentIndex:currentIndex + 1]);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
-            currentState = 0;
+            currentState = '0';
         elif (line[currentIndex] == '-'):
             if (line[currentIndex + 1] == '-'):
                 t = Token('ART', lineCount, currentIndex, currentIndex + 2, line[currentIndex:currentIndex + 2]);
                 tokensFoundInThisLine.append(t);
                 currentIndex = currentIndex + 2;
-                currentState = 0;
+                currentState = '0';
             else:
                 tokenStartIndex = currentIndex;
                 currentIndex = currentIndex + 1;
-                currentState = 20;
+                currentState = '20';
         elif (re.match(r'\d', line[currentIndex])):
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
-            currentState = 21;
+            currentState = '21';
         elif(line[currentIndex] == ' ' or line[currentIndex] == '\t' or line[currentIndex] == '\n'):
             currentIndex = currentIndex + 1;
-            currentState = 0;
+            currentState = '0';
         else:
             mlkmk = line[currentIndex];
             t = Token('TMF', lineCount, currentIndex, currentIndex, mlkmk);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
-            currentState = 0;
-    elif(currentState == 2):
+            currentState = '0';
+    elif(currentState == '2'):
         if (line[currentIndex] == '*'):
-            currentState = 8;
+            currentState = '8';
             tokenStartIndex = currentIndex - 1; # considerando a barra anterior
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '/'):
@@ -125,13 +125,13 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             #tokensFoundInThisLine.append(t);
             exitLoop = True;
             currentIndex = lineLength - 1;
-            currentState = 0;
+            currentState = '0';
         else:
             t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex - 1: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
-    elif(currentState == 5):
+    elif(currentState == '5'):
         if(currentIndex + 1 >= lineLength):
             atEndOfLine = line[tokenStartIndex:]
             if (isReserved(line[tokenStartIndex: currentIndex])):
@@ -139,7 +139,7 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             else:
                 t = Token('IDE', lineCount, tokenStartIndex, currentIndex, atEndOfLine);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             tokenStartIndex = 0;
         elif (line[currentIndex] == '_' or re.match(r'[a-zA-Z]+', line[currentIndex]) or re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
@@ -150,9 +150,9 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             else:
                 t = Token('IDE', lineCount, tokenStartIndex, currentIndex, ideToken);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             tokenStartIndex = 0;
-    elif(currentState == 6):
+    elif(currentState == '6'):
         if (line[currentIndex] == '"'):
             stoken = line[tokenStartIndex: currentIndex + 1];
             if (hasNonASCII(stoken)):
@@ -160,20 +160,20 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             else:
                 t = Token('CAC', lineCount, tokenStartIndex, currentIndex, stoken);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             tokenStartIndex = 0;
             currentIndex = currentIndex + 1;
         elif(line[currentIndex] == '\n'):
             t = Token('CMF', lineCount, tokenStartIndex, lineLength, line[tokenStartIndex: lineLength - 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             tokenStartIndex = 0;
             currentIndex = currentIndex + 1;
         else:
             currentIndex = currentIndex + 1;
-    elif(currentState == 8):
+    elif(currentState == '8'):
         if (line[currentIndex] == '*'):
-            currentState = 10;
+            currentState = '10';
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '\n' or currentIndex == lineLength -1):
             l = line.replace('\n', '');
@@ -182,77 +182,77 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
             currentIndex = currentIndex + 1;
         else:
             currentIndex = currentIndex + 1;
-    elif(currentState == 10):
+    elif(currentState == '10'):
         if (line[currentIndex] == '/'):
             t = Token('COM', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             #tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
-            currentState = 8;
+            currentState = '8';
             currentIndex = currentIndex + 1;
-    elif(currentState == 14):
+    elif(currentState == '14'):
         if (line[currentIndex] == '&'):
             t = Token('LOG', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
             t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
-            currentState = 0;
-    elif(currentState == 16):
+            currentState = '0';
+    elif(currentState == '16'):
         if (line[currentIndex] == '|'):
             t = Token('LOG', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
             t = Token('TMF', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
             currentIndex = currentIndex + 1;
-            currentState = 0;
-    elif(currentState == 12):
+            currentState = '0';
+    elif(currentState == '12'):
         if (line[currentIndex] == '='):
             t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
             t = Token('LOG', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 18):
+            currentState = '0';
+    elif(currentState == '18'):
         if (line[currentIndex] == '='):
             t = Token('REL', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
             t = Token('REL', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 19):
+            currentState = '0';
+    elif(currentState == '19'):
         if (line[currentIndex] == '+'):
             t = Token('ART', lineCount, currentIndex -1, currentIndex + 1, line[currentIndex -1: currentIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
             currentIndex = currentIndex + 1;
         else:
             t = Token('ART', lineCount, currentIndex -1, currentIndex, line[currentIndex -1: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 20):
+            currentState = '0';
+    elif(currentState == '20'):
         if (re.match(r'\d', line[currentIndex])):
-            currentState = 21;
+            currentState = '21';
         elif (line[currentIndex] == ' '):
             currentIndex = currentIndex + 1;
         else:
             t = Token('ART', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 21):
+            currentState = '0';
+    elif(currentState == '21'):
         if(currentIndex + 1 >= lineLength):
             l = line[tokenStartIndex:]
             if (l[len(l) - 1] == '\n'):
@@ -264,54 +264,54 @@ def findTokensInString(line: str, lineCount: int, initialState: int, overflow: s
         elif (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '.'):
-            currentState = 22;
+            currentState = '22';
             currentIndex = currentIndex + 1;
         else:
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
             if (line[currentIndex] == ' ' or line[currentIndex] == '-' or line[currentIndex] == '\t'):
-                currentState = 24;
+                currentState = '24';
             else:
-                currentState = 0;
-    elif(currentState == 22):
+                currentState = '0';
+    elif(currentState == '22'):
         if (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
-            currentState = 23;
+            currentState = '23';
         else:
             t = Token('NMF', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 23):
+            currentState = '0';
+    elif(currentState == '23'):
         if (re.match(r'\d', line[currentIndex])):
             currentIndex = currentIndex + 1;
         else:
             t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
-    elif(currentState == 24):
+            currentState = '0';
+    elif(currentState == '24'):
         if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
             currentIndex = currentIndex + 1;
         elif (line[currentIndex] == '-'):
             tokenStartIndex = currentIndex;
             currentIndex = currentIndex + 1;
-            currentState = 25;
+            currentState = '25';
         else:
-            currentState = 0;
-    elif(currentState == 25):
+            currentState = '0';
+    elif(currentState == '25'):
         if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
             currentIndex = currentIndex + 1;
         elif (re.match(r'\d', line[currentIndex])):
             t = Token('ART', lineCount, tokenStartIndex, tokenStartIndex + 1, line[tokenStartIndex: tokenStartIndex + 1]);
             tokensFoundInThisLine.append(t);
-            currentState = 0;
+            currentState = '0';
         else:
             currentIndex = tokenStartIndex;
-            currentState = 0;
+            currentState = '0';
     else:
         exitLoop = True;
 
-  if (currentState != 8):
-    currentState = 0;
+  if (currentState != '8'):
+    currentState = '0';
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 
