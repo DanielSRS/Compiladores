@@ -119,14 +119,46 @@ def ArithmeticOperatorAutomata(state: str, input: str):
     if (state == 'Arithmetic-' and input == ' '):
         return 'ArithmeticPossibleNROorART'
     if (state == 'Arithmetic-' and re.match(r'\d', input)):
-        return 'NegativeNumber'
+        return 'Number'
     if (state == 'ArithmeticPossibleNROorART' and re.match(r'\d', input)):
-        return 'NegativeNumber'
+        return 'Number'
     if (state == 'ArithmeticPossibleNROorART' and input == ' '):
         return 'ArithmeticPossibleNROorART'
     if (state == 'ArithmeticPossibleNROorART'):
         return 'ArithmeticOperatorFinal'
+    if (state == 'PossibleArithmeticMinus' and input == ' ' or input == '\t'):
+        return 'PossibleArithmeticMinus'
+    if (state == 'PossibleArithmeticMinus' and re.match(r'\d', input)):
+        return 'ArithmeticOperatorFinal'
+    if (state == 'PossibleArithmeticMinus'):
+        return 'GoBack'
     return 'ArithmeticOperatorFinal';
+
+def NumbertAutomata(state: str, input: str):
+    if (state == 'Number' and re.match(r'\d', input)):
+        return 'Number'
+    if (state == 'Number' and input == '.'):
+        return 'FPNumber'
+    if (state == 'FPNumber' and re.match(r'\d', input)):
+        return 'FPNumberComplete'
+    if (state == 'FPNumberComplete' and re.match(r'\d', input)):
+        return 'FPNumberComplete'
+    if (state == 'FPNumberComplete' and not re.match(r'\d', input)):
+        return 'NumberFinal'
+    if (state == 'FPNumber' and not re.match(r'\d', input)):
+        return 'MalformedNumber'
+    if (state == 'Number' and not (input == ' ' or input == '-' or input == '\t')):
+        return 'NumberFinal'
+    if (state == 'Number' and input == ' ' or input == '-' or input == '\t'):
+        return 'NumberFinalInPossibleOperation'
+    if (state == 'NumberFinalInPossibleOperation' and (input == ' ' or input == '\t')):
+        return 'NumberFinalInPossibleOperation'
+    if (state == 'NumberFinalInPossibleOperation' and input == '-'):
+        return 'PossibleArithmeticMinus'
+    if (state == 'NumberFinalInPossibleOperation'):
+        return 'InitialState'
+    else:  # esse else ta errado
+        return 'NumberFinal'
 
 def getNextState(state: str, input: str) -> str:
     if (not state == 'InitialState'):
@@ -154,7 +186,11 @@ def getNextState(state: str, input: str) -> str:
         return 'Arithmetic*';
     elif (input == '-'):
         return 'Arithmetic-';
-    return '0';
+    elif (re.match(r'\d', input)):
+        return 'Number';
+    elif (input == ' ' or input == '\t' or input == '\n'):
+        return ('InitialState');
+    return 'MalformedToken';
 
 def isFinalState(state: str):
     finalStates = {
@@ -166,6 +202,9 @@ def isFinalState(state: str):
         'ArithmeticFinal',
         'LogicalOperatorFinal',
         'MalformedToken',
+        'NumberFinal',
+        'ArithmeticOperatorFinal',
+        'RelationalOperatorFinal',
     };
     if state in finalStates:
         return True;
@@ -182,6 +221,10 @@ def getTokenType(state: str):
         'LogicalOperatorFinal': 'LOG',
         'MalformedToken': 'TMF',
         'RelationalOperatorFinal': 'REL',
+        'ArithmeticOperatorFinal': 'ART',
+        'NumberFinal': 'NRO',
+        'MalformedNumber': 'NMF',
+        'MalformedNumberFinal': 'NMF',
     }
     return stateToTokenType.get(state, 'None');
 
@@ -203,6 +246,8 @@ def findApropriateAutomata(state: str) -> Automata:
         return RelationalOperatorAutomata;
     elif ('Arithmetic' in state):
         return ArithmeticOperatorAutomata;
+    elif ('Number' in state):
+        return NumbertAutomata;
     return ErrorAutomata;
 
 def generateToken(state: str, lineNumber: int, lineText: str, tokenStartIndex: int, tokenEndIndex: int):
@@ -236,6 +281,13 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
     # Proximo estado, dado o caractere lido
     nextState: str = getNextState(currentState, character);
 
+    if (currentState == 'NumberFinalInPossibleOperation'):
+        token = generateToken(currentState, lineCount, line, tokenStartIndex, currentIndex);
+        tokensFoundInThisLine.append(token);
+    
+    if (currentState == 'GoBack'):
+        currentIndex = tokenStartIndex;
+
     # Se for um estado final, gere um token
     if (isFinalState(nextState)):
         token = generateToken(currentState, lineCount, line, tokenStartIndex, currentIndex);
@@ -257,79 +309,6 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
 
         currentState = nextState            # Define o priximo estado
         currentIndex = currentIndex + 1;
-
-    if (currentState == '0'):
-        if (re.match(r'\d', line[currentIndex])):
-            tokenStartIndex = currentIndex;
-            currentIndex = currentIndex + 1;
-            currentState = '21';
-        elif(line[currentIndex] == ' ' or line[currentIndex] == '\t' or line[currentIndex] == '\n'):
-            currentIndex = currentIndex + 1;
-            currentState = '0';
-        else:
-            mlkmk = line[currentIndex];
-            t = Token('TMF', lineCount, currentIndex, currentIndex, mlkmk);
-            tokensFoundInThisLine.append(t);
-            currentIndex = currentIndex + 1;
-            currentState = '0';
-
-    elif(currentState == '21'):
-        if(currentIndex + 1 >= lineLength):
-            l = line[tokenStartIndex:]
-            if (l[len(l) - 1] == '\n'):
-                l = l
-                #l = l[ :- 1]
-            t = Token('NRO', lineCount, tokenStartIndex, currentIndex, l);
-            tokensFoundInThisLine.append(t);
-            currentIndex = currentIndex + 1;
-        elif (re.match(r'\d', line[currentIndex])):
-            currentIndex = currentIndex + 1;
-        elif (line[currentIndex] == '.'):
-            currentState = '22';
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            if (line[currentIndex] == ' ' or line[currentIndex] == '-' or line[currentIndex] == '\t'):
-                currentState = '24';
-            else:
-                currentState = '0';
-    elif(currentState == '22'):
-        if (re.match(r'\d', line[currentIndex])):
-            currentIndex = currentIndex + 1;
-            currentState = '23';
-        else:
-            t = Token('NMF', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-    elif(currentState == '23'):
-        if (re.match(r'\d', line[currentIndex])):
-            currentIndex = currentIndex + 1;
-        else:
-            t = Token('NRO', lineCount, tokenStartIndex, currentIndex, line[tokenStartIndex: currentIndex]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-    elif(currentState == '24'):
-        if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
-            currentIndex = currentIndex + 1;
-        elif (line[currentIndex] == '-'):
-            tokenStartIndex = currentIndex;
-            currentIndex = currentIndex + 1;
-            currentState = '25';
-        else:
-            currentState = '0';
-    elif(currentState == '25'):
-        if (line[currentIndex] == ' ' or line[currentIndex] == '\t'):
-            currentIndex = currentIndex + 1;
-        elif (re.match(r'\d', line[currentIndex])):
-            t = Token('ART', lineCount, tokenStartIndex, tokenStartIndex + 1, line[tokenStartIndex: tokenStartIndex + 1]);
-            tokensFoundInThisLine.append(t);
-            currentState = '0';
-        else:
-            currentIndex = tokenStartIndex;
-            currentState = '0';
-    else:
-        exitLoop = True;
 
   if (currentState != '8'):
     currentState = '0';
