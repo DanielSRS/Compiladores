@@ -38,7 +38,7 @@ def hasNonASCII(s: str):
 Automata = Callable[[str, str], str];
 
 def IdendifierAutomata(state: str, input: str):
-    isValid = re.match(r'[a-zA-Z]+', input) or re.match(r'\d', input);
+    isValid = re.match(r'[a-zA-Z]+', input) or re.match(r'\d', input) or input == '_';
     if (state == 'IdentifierFinal'):
         return 'IdentifierFinal';
     if (state == 'Identifier' and isValid):
@@ -62,6 +62,8 @@ def StringAutomata(state: str, input: str):
         return 'StringFinal';
     if (state == 'String' and input == '\n'):
         return 'MalformedString';
+    if (state == 'MalformedString' and input == '\n'):
+        return 'MalformedStringFinal';
     return 'String';
 
 def CommentAutomata(state: str, input: str):
@@ -161,6 +163,8 @@ def NumbertAutomata(state: str, input: str):
         return 'NumberFinal'
 
 def getNextState(state: str, input: str) -> str:
+    if (state == 'MalformedToken'):
+        return 'MalformedTokenFinal';
     if (not state == 'InitialState'):
         automata: Automata = findApropriateAutomata(state);
         return automata(state, input);
@@ -195,16 +199,18 @@ def getNextState(state: str, input: str) -> str:
 def isFinalState(state: str):
     finalStates = {
         'DelimiterFinal',
-        'MalformedString',
+        'MalformedStringFinal',
         'StringFinal',
         'LineCommentFinal',
         'BlockCommentFinal',
         'ArithmeticFinal',
         'LogicalOperatorFinal',
-        'MalformedToken',
         'NumberFinal',
         'ArithmeticOperatorFinal',
         'RelationalOperatorFinal',
+        'IdentifierFinal',
+        'MalformedNumberFinal',
+        'MalformedTokenFinal',
     };
     if state in finalStates:
         return True;
@@ -213,18 +219,19 @@ def isFinalState(state: str):
 def getTokenType(state: str):
     stateToTokenType = {
         'DelimiterFinal': 'DEL',
-        'MalformedString': 'CMF',
+        'MalformedStringFinal': 'CMF',
         'StringFinal': 'CAC',
         'LineCommentFinal': 'COM',
         'BlockCommentFinal': 'CMB',
         'ArithmeticFinal': 'ART',
         'LogicalOperatorFinal': 'LOG',
-        'MalformedToken': 'TMF',
+        'MalformedTokenFinal': 'TMF',
         'RelationalOperatorFinal': 'REL',
         'ArithmeticOperatorFinal': 'ART',
         'NumberFinal': 'NRO',
         'MalformedNumber': 'NMF',
         'MalformedNumberFinal': 'NMF',
+        'IdentifierFinal': 'IDE',
     }
     return stateToTokenType.get(state, 'None');
 
@@ -290,17 +297,21 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
 
     # Se for um estado final, gere um token
     if (isFinalState(nextState)):
-        token = generateToken(currentState, lineCount, line, tokenStartIndex, currentIndex);
-        tokensFoundInThisLine.append(token);    # Apos salvar o token
+        token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
+        if (not token.token == 'COM'):
+            tokensFoundInThisLine.append(token);    # Apos salvar o token
         currentState = 'InitialState';          # Volte para o estado inicial
     
     # Do contrario, leia o proximo caractere
     else:
         # Se a linha termina e o estado não é final, decrementa o index
         # para chegar num estado final na proxima iteração
-        if (currentIndex + 1 >= lineLength):
-            nextState = toFinalState(nextState);    # Define o estado como final
-            currentIndex = currentIndex - 1;
+        if (currentIndex + 1 >= lineLength and not nextState == 'InitialState'):
+            currentIndex = currentIndex + 1;
+            token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
+            if (not token.token == 'COM'):
+                tokensFoundInThisLine.append(token);    # Apos salvar o token
+            currentState = 'InitialState'; 
 
         # Se há um comentario de bloco multilinha
         if (currentState == 'BlockCommentOverflow'):
@@ -310,8 +321,8 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
         currentState = nextState            # Define o priximo estado
         currentIndex = currentIndex + 1;
 
-  if (currentState != '8'):
-    currentState = '0';
+  if (currentState != 'BlockCommentOverflow'):
+    currentState = 'InitialState';
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 

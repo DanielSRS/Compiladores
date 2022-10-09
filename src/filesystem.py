@@ -35,7 +35,7 @@ def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, str, 
   # Lê cada linha do arquivo e passa para a função de callback on_line
 
   response: list[Token] = [];
-  currentState: ResTokenList = ResTokenList('0', 0, 0, '', []);
+  currentState: ResTokenList = ResTokenList('InitialState', 0, 0, '', []);
 
   # Loop through each line via file handler
   for count, line in enumerate(opened_file):
