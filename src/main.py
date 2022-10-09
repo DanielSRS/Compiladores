@@ -82,6 +82,8 @@ def CommentAutomata(state: str, input: str):
     if (state == 'BlockComment' and input == '*'):
         return 'ClosingBlockComment'
     if (state == 'ClosingBlockComment' and input == '/'):
+        return 'BlockCommentComplete'
+    if (state == 'BlockCommentComplete'):
         return 'BlockCommentFinal'
     if (state == 'ClosingBlockComment' and not input == '/'):
         return 'BlockComment'
@@ -148,7 +150,7 @@ def NumbertAutomata(state: str, input: str):
     if (state == 'FPNumberComplete' and not re.match(r'\d', input)):
         return 'NumberFinal'
     if (state == 'FPNumber' and not re.match(r'\d', input)):
-        return 'MalformedNumber'
+        return 'MalformedNumberFinal'
     if (state == 'Number' and not (input == ' ' or input == '-' or input == '\t')):
         return 'NumberFinal'
     if (state == 'Number' and input == ' ' or input == '-' or input == '\t'):
@@ -273,7 +275,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
   currentIndex: int = 0;
   currentState: str = initialState;
   tokensFoundInThisLine: list[Token] = [];
-  tokenOverflow: str = overflow if initialState == '8' else '';
+  tokenOverflow: str = overflow if initialState == 'BlockComment' else '';
 
   exitLoop = False;
 
@@ -298,7 +300,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
     # Se for um estado final, gere um token
     if (isFinalState(nextState)):
         token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
-        if (not token.token == 'COM'):
+        if (not (token.token == 'COM' or token.token == 'CMB')):
             tokensFoundInThisLine.append(token);    # Apos salvar o token
         currentState = 'InitialState';          # Volte para o estado inicial
     
@@ -306,23 +308,21 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
     else:
         # Se a linha termina e o estado não é final, decrementa o index
         # para chegar num estado final na proxima iteração
-        if (currentIndex + 1 >= lineLength and not nextState == 'InitialState'):
-            currentIndex = currentIndex + 1;
-            token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
-            if (not token.token == 'COM'):
-                tokensFoundInThisLine.append(token);    # Apos salvar o token
-            currentState = 'InitialState'; 
-
-        # Se há um comentario de bloco multilinha
-        if (currentState == 'BlockCommentOverflow'):
-            tokenOverflow = line[tokenStartIndex:].replace('\n', '');
-            exitLoop = True;
+        #if (currentIndex + 1 >= lineLength and not nextState == 'InitialState'):
+        #    currentIndex = currentIndex + 1;
+        #    token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
+        #    if (not (token.token == 'COM' or token.token == 'CMB')):
+        #        tokensFoundInThisLine.append(token);    # Apos salvar o token
+        #    currentState = 'InitialState';
 
         currentState = nextState            # Define o priximo estado
         currentIndex = currentIndex + 1;
 
   if (currentState != 'BlockCommentOverflow'):
     currentState = 'InitialState';
+  else:
+    tokenOverflow = line[tokenStartIndex:].replace('\n', '');
+    currentState = 'BlockComment';
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
 
