@@ -8,4 +8,4 @@ saida
 saidas_dos_testes
 
 # arquivos de cache do python
-src/__pycache__
+*.pyc
