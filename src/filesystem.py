@@ -45,7 +45,7 @@ def readFileLines(opened_file: TextIOWrapper, on_line: Callable[[str, int, str, 
     response = response + res.tokenList;
     currentState = res;
   
-  if (currentState.lastState == '8'):
+  if (currentState.lastState == 'BlockComment'):
     t = Token('CoMF', currentState.tokenStartLine, currentState.lastStartTokenIndex, 0, currentState.tokenOverflow);
     response.append(t);
   

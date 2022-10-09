@@ -93,13 +93,15 @@ def CommentAutomata(state: str, input: str):
 
 def LogicalOperatorAutomata(state: str, input: str):
     if (state == 'PossibleLogical&&' and input == '&'):
+        return 'DoubleLogicalOperator'
+    if (state == 'DoubleLogicalOperator'):
         return 'LogicalOperatorFinal'
     if (state == 'PossibleLogical||' and input == '|'):
-        return 'LogicalOperatorFinal'
+        return 'DoubleLogicalOperator'
     if (state == 'PossibleLogical!' and not input == '='):
         return 'LogicalOperatorFinal'
     if (state == 'PossibleLogical!' and input == '='):
-        return 'RelationalOperatorFinal'
+        return 'DoubleRelationalOperator'
     return 'MalformedToken';
 
 def RelationalOperatorAutomata(state: str, input: str):
@@ -321,7 +323,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
             nextState = getNextState(nextState, '\n');
             currentIndex = currentIndex + 2;
             token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
-            if (not (token.token == 'COM' or token.token == 'CMB')):
+            if (not (token.token == 'COM' or token.token == 'CMB' or token.token == 'None')):
                 tokensFoundInThisLine.append(token);    # Apos salvar o token
             currentState = 'InitialState';
 
@@ -331,7 +333,7 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
   if (currentState != 'BlockCommentOverflow'):
     currentState = 'InitialState';
   else:
-    tokenOverflow = line[tokenStartIndex:].replace('\n', '');
+    tokenOverflow = tokenOverflow + line[tokenStartIndex:].replace('\n', '');
     currentState = 'BlockComment';
   return ResTokenList(currentState, tokenStartIndex, lineCount, tokenOverflow, tokensFoundInThisLine);
 
