@@ -59,6 +59,8 @@ def ErrorAutomata(state: str, input: str):
 
 def StringAutomata(state: str, input: str):
     if (state == 'String' and input == '"'):
+        return 'StringComplete';
+    if (state == 'StringComplete'):
         return 'StringFinal';
     if (state == 'String' and input == '\n'):
         return 'MalformedString';
