@@ -153,13 +153,19 @@ def NumbertAutomata(state: str, input: str):
         return 'MalformedNumberFinal'
     if (state == 'Number' and not (input == ' ' or input == '-' or input == '\t')):
         return 'NumberFinal'
-    if (state == 'Number' and input == ' ' or input == '-' or input == '\t'):
+    if (state == 'Number' and (input == ' ' or input == '-' or input == '\t')):
         return 'NumberFinalInPossibleOperation'
     if (state == 'NumberFinalInPossibleOperation' and (input == ' ' or input == '\t')):
-        return 'NumberFinalInPossibleOperation'
+        return 'NumberFinalInPossibleOperation_'
+    if (state == 'NumberFinalInPossibleOperation_' and (input == ' ' or input == '\t')):
+        return 'NumberFinalInPossibleOperation_'
     if (state == 'NumberFinalInPossibleOperation' and input == '-'):
         return 'PossibleArithmeticMinus'
+    if (state == 'NumberFinalInPossibleOperation_' and input == '-'):
+        return 'PossibleArithmeticMinus'
     if (state == 'NumberFinalInPossibleOperation'):
+        return 'InitialState'
+    if (state == 'NumberFinalInPossibleOperation_'):
         return 'InitialState'
     else:  # esse else ta errado
         return 'NumberFinal'
@@ -290,12 +296,15 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
     # Proximo estado, dado o caractere lido
     nextState: str = getNextState(currentState, character);
 
-    if (currentState == 'NumberFinalInPossibleOperation'):
-        token = generateToken(currentState, lineCount, line, tokenStartIndex, currentIndex);
+    if (nextState == 'NumberFinalInPossibleOperation'):
+        token = generateToken('NumberFinal', lineCount, line, tokenStartIndex, currentIndex);
         tokensFoundInThisLine.append(token);
+        tokenStartIndex = currentIndex;
+        currentIndex = currentIndex - 1;
     
-    if (currentState == 'GoBack'):
-        currentIndex = tokenStartIndex;
+    if (nextState == 'GoBack'):
+        nextState = 'InitialState'; 
+        currentIndex = tokenStartIndex - 1;
 
     # Se for um estado final, gere um token
     if (isFinalState(nextState)):
@@ -308,12 +317,13 @@ def findTokensInString(line: str, lineCount: int, initialState: str, overflow: s
     else:
         # Se a linha termina e o estado não é final, decrementa o index
         # para chegar num estado final na proxima iteração
-        #if (currentIndex + 1 >= lineLength and not nextState == 'InitialState'):
-        #    currentIndex = currentIndex + 1;
-        #    token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
-        #    if (not (token.token == 'COM' or token.token == 'CMB')):
-        #        tokensFoundInThisLine.append(token);    # Apos salvar o token
-        #    currentState = 'InitialState';
+        if (currentIndex + 1 >= lineLength and not (nextState == 'InitialState' or nextState == 'BlockCommentOverflow')):
+            nextState = getNextState(nextState, '\n');
+            currentIndex = currentIndex + 2;
+            token = generateToken(nextState, lineCount, line, tokenStartIndex, currentIndex);
+            if (not (token.token == 'COM' or token.token == 'CMB')):
+                tokensFoundInThisLine.append(token);    # Apos salvar o token
+            currentState = 'InitialState';
 
         currentState = nextState            # Define o priximo estado
         currentIndex = currentIndex + 1;
