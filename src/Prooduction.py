@@ -1,11 +1,14 @@
-from typing import Dict
+from typing import Dict, List
 
 from TokenUtils.Token import Token
 
+Rule = List[str];
+ProductionRules = List[Rule];
 
-comp = ['IDE', '.', 'IDE'];
 
-Mapped = Dict[str, 'list[str]']
+comp = [['IDE', '.', 'IDE']];
+
+Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
   '<Comp>': comp,
@@ -20,9 +23,10 @@ def isNonTerminal(token: str):
   return False;
 
 
-def Production(prod: 'list[str]', tokens: 'list[Token]'):
+def Production(prod: ProductionRules, tokens: 'list[Token]'):
   errors: list[str] = [];
-  for to in prod:
+  rule = prod[0];
+  for to in rule:
     lookahead = tokens.pop();
     if (isNonTerminal(to)):
       p = map.get(to);
