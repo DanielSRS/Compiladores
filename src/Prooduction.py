@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from TokenUtils.Token import Token
 
@@ -6,7 +6,7 @@ Rule = List[str];
 ProductionRules = List[Rule];
 
 
-comp = [['IDE', '.', 'IDE']];
+comp = [['{', '.', 'IDE'], ['IDE', '.', 'IDE']];
 
 Mapped = Dict[str, ProductionRules]
 
@@ -47,12 +47,29 @@ def getFists(productionRules: ProductionRules):
       conjuntoFisrt.append([rule[0]]);
   return conjuntoFisrt;                               # Retorna o conjunto encontrado
 
+def chooseProduction(production: ProductionRules, token: Token) -> Optional[int]:
+  conjuntoFist = getFists(production);
+  for index, listOffists in enumerate(conjuntoFist):
+    if token.value in listOffists:
+      return index;
+    if token.token in listOffists:
+      return index;
 
-def Production(prod: ProductionRules, tokens: 'list[Token]'):
+
+def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0):
   errors: list[str] = [];
-  rule = prod[0];
+  tokenIndex = initialTokenindex;
+  if (len(tokens) < 1):
+    raise Exception("Não há tokens suficientes");
+  lookahead: Token = tokens[tokenIndex];
+  productionIndex = chooseProduction(prod, lookahead);
+  if (productionIndex == None):
+    raise Exception('Não encotrada produção adequada');
+  rule: Rule = prod[productionIndex];
+  print("selected rule index: ", productionIndex, "\n");
+  print(rule);
   for to in rule:
-    lookahead = tokens.pop();
+    lookahead = tokens[tokenIndex];
     if (isNonTerminal(to)):
       p = map.get(to);
       if (p == None):
@@ -66,6 +83,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]'):
       print("Passado del");
     else:
       errors.append('teve erro');
+    tokenIndex = tokenIndex + 1;
   if (len(errors) == 0):
     print("Passed!");
   else:
