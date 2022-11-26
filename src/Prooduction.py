@@ -6,7 +6,7 @@ Rule = List[str];
 ProductionRules = List[Rule];
 
 
-comp = [['{', '.', 'IDE'], ['IDE', '.', 'IDE']];
+comp = [['IDE', '.', 'IDE']];
 
 Mapped = Dict[str, ProductionRules]
 
@@ -14,7 +14,9 @@ map: Mapped = {
   '<Comp>': comp,
 };
 
-t_comp = [Token('IDE', 1, 0, 2, 'val'), Token('DEL', 1, 0, 2, '.'), Token('IDE', 1, 0, 2, 'val')]
+t_comp = [Token('IDE', 1, 0, 2, 'val'),
+          Token('DEL', 1, 0, 2, '.'),
+          Token('IDE', 1, 0, 2, 'val')]
 
 
 def isNonTerminal(token: str):
@@ -69,6 +71,9 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
   print("selected rule index: ", productionIndex, "\n");
   print(rule);
   for to in rule:
+    if (tokenIndex >= len(tokens)):
+      errmsg = "Esperado: " + to + " mas encotrado fim de arquivo (EOF)";
+      raise Exception(errmsg);
     lookahead = tokens[tokenIndex];
     if (isNonTerminal(to)):
       p = map.get(to);
