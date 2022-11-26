@@ -4,10 +4,12 @@ from typing import Dict, List
 Rule = List[str];
 ProductionRules = List[Rule];
 
+# Operadores relacionais
+REL = [['!='], ['=='], ['<'], ['<='], ['>'], ['>='], ['=']];
 
 comp = [['-IDE', '.', '-IDE']];
 
-#Matriz
+# Matriz
 Matriz = [['-IDE', '<DimensoesDeAcesso>']];
 DimensoesDeAcesso = [['<Access>', '<end>']];
 Access = [['[', '<Indice>', ']']];
@@ -23,4 +25,5 @@ map: Mapped = {
   '<Access>': Access,
   '<end>': end,
   '<Indice>': Indice,
+  '<REL>': REL,
 };
