@@ -96,7 +96,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
       p = map.get(to);                                                       # Encontra a produção para esse não terminal
       if (p == None):                                                        # Erro caso  a produção não exista
         raise Exception("Produção inexistente!!");
-      res = Production(p, tokens);
+      res = Production(p, tokens, tokenIndex);
       tokenIndex = res['tokenIndex'] - 1;
     
     elif (isSemiTerminal(to)):                                               # Se for um terminal, cujo valor do token não é importante
