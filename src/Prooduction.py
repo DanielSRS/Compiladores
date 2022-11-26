@@ -6,7 +6,7 @@ Rule = List[str];
 ProductionRules = List[Rule];
 
 
-comp = [['IDE', '.', 'IDE']];
+comp = [['-IDE', '.', '-IDE']];
 
 Mapped = Dict[str, ProductionRules]
 
@@ -23,6 +23,16 @@ def isNonTerminal(token: str):
   if (token[0] == '<'):
     return True;
   return False;
+
+def isSemiTerminal(sm: str):
+  semis = { '-IDE', };
+  if sm in semis:
+    return True;
+  return False;
+
+def matchSemiterminal(received: str, target: str):
+  sanitazed = target[1:];
+  return True if received == sanitazed else False;
 
 # Dado as regras de uma produção, retorna
 # o conjunto fisrt dessa produção.
@@ -54,39 +64,47 @@ def chooseProduction(production: ProductionRules, token: Token) -> Optional[int]
   for index, listOffists in enumerate(conjuntoFist):
     if token.value in listOffists:
       return index;
-    if token.token in listOffists:
+    if "-" + token.token in listOffists:
       return index;
 
 
 def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0):
-  errors: list[str] = [];
-  tokenIndex = initialTokenindex;
-  if (len(tokens) < 1):
+  errors: list[str] = [];                                                     # Lista de erros entontrados
+  tokenIndex = initialTokenindex;                                             # Index do token lido
+  if (len(tokens) < 1):                                                       # Se não houver mais tokens
     raise Exception("Não há tokens suficientes");
-  lookahead: Token = tokens[tokenIndex];
-  productionIndex = chooseProduction(prod, lookahead);
-  if (productionIndex == None):
+
+  lookahead: Token = tokens[tokenIndex];                                      # toke sendo verificado
+  productionIndex = chooseProduction(prod, lookahead);                        # Escolhe a regra adequada, de acordo com  a 
+                                                                              # produção tual
+  
+  if (productionIndex == None):                                               # Se o token atula não fizer parte das regras da produção
     raise Exception('Não encotrada produção adequada');
-  rule: Rule = prod[productionIndex];
+  
+  rule: Rule = prod[productionIndex];                                         # Define a regra de produção a ser usada
   print("selected rule index: ", productionIndex, "\n");
   print(rule);
+
   for to in rule:
     if (tokenIndex >= len(tokens)):
       errmsg = "Esperado: " + to + " mas encotrado fim de arquivo (EOF)";
       raise Exception(errmsg);
     lookahead = tokens[tokenIndex];
-    if (isNonTerminal(to)):
-      p = map.get(to);
-      if (p == None):
+    if (isNonTerminal(to)):                                                  # Se for um não terminal
+      p = map.get(to);                                                       # Encontra a produção para esse não terminal
+      if (p == None):                                                        # Erro caso  a produção não exista
         print("Produção inexistente!!");
         return;
       Production(p, tokens);
-    if (to == 'IDE'):
-      if (lookahead.token == 'IDE'):
-        print("Passado ide");
-    elif (to == lookahead.value):
-      print("Passado del");
-    else:
+    
+    elif (isSemiTerminal(to)):                                                 # Se for um terminal, cujo valor do token não é importante
+      if (matchSemiterminal(lookahead.token, to)):                           # verifica o apenas se o tipo do token é o esperado
+        print("Passado ", to);
+      else:
+        print('Erro na ver do token');
+    elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
+      print("Passado del");                                                  # ao valor esperao
+    else:                                                                    # se não for, lança erro
       errors.append('teve erro');
     tokenIndex = tokenIndex + 1;
   if (len(errors) == 0):
