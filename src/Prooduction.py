@@ -37,9 +37,19 @@ def isNonTerminal(token: str):
   return False;
 
 def isSemiTerminal(sm: str):
-  semis = { '-IDE', };
+  semis = { '-IDE', '-NRO' };
   if sm in semis:
     return True;
+  return False;
+
+def canBeEmpty(rule: str):
+  if (isNonTerminal(rule)):
+    production = map.get(rule);
+    if (production == None):
+      raise Exception("Não foi possivel verifica se é vazio!!");
+    for conjunto in getFists(production):
+      if "" in conjunto:
+        return True;
   return False;
 
 def matchSemiterminal(received: str, target: str):
@@ -83,7 +93,7 @@ class ProductionRes(TypedDict):
   tokenIndex: int
 
 def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0) -> ProductionRes:
-  errors: list[str] = [];                                                     # Lista de erros entontrados
+  # errors: list[str] = [];                                                   # Lista de erros entontrados
   tokenIndex = initialTokenindex;                                             # Index do token lido
   if (len(tokens) < 1):                                                       # Se não houver mais tokens
     raise Exception("Não há tokens suficientes");
@@ -101,6 +111,9 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
 
   for to in rule:
     if (tokenIndex >= len(tokens)):
+      if (canBeEmpty(to)):                                                   # Se a produção pode ser vazia e não há mais tokens 
+        tokenIndex = tokenIndex + 1;                                         # Icrement o token, pois a execução do loop vai ser interrompida
+        continue;                                                            # Pula para a proxima iteração do loop
       errmsg = "Esperado: " + to + " mas encotrado fim de arquivo (EOF)";
       raise Exception(errmsg);
     lookahead = tokens[tokenIndex];
