@@ -7,6 +7,9 @@ ProductionRules = List[Rule];
 # Operadores relacionais
 REL = [['!='], ['=='], ['<'], ['<='], ['>'], ['>='], ['=']];
 
+# Valor booleano
+Boolean = [['true'], ['false']];
+
 comp = [['-IDE', '.', '-IDE']];
 
 # Matriz
@@ -26,4 +29,5 @@ map: Mapped = {
   '<end>': end,
   '<Indice>': Indice,
   '<REL>': REL,
+  '<Boolean>': Boolean,
 };
