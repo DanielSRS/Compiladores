@@ -19,7 +19,7 @@ def isSemiTerminal(sm: str):
     return True;
   return False;
 
-def canBeEmpty(rule: str):
+def canRuleBeEmpty(rule: str):
   if (isNonTerminal(rule)):
     production = map.get(rule);
     if (production == None):
@@ -28,6 +28,17 @@ def canBeEmpty(rule: str):
       if "" in conjunto:
         return True;
   return False;
+
+def canProductionBeEmpty(production: ProductionRules):
+  res = False;
+  for rule in production:
+    if (len(rule) < 1):
+      res = True;
+      continue;
+    for r in rule:
+      if (canRuleBeEmpty(r)):
+        res = True;
+  return res;
 
 def matchSemiterminal(received: str, target: str):
   sanitazed = target[1:];
@@ -80,6 +91,10 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
                                                                               # produção tual
   
   if (productionIndex == None):                                               # Se o token atula não fizer parte das regras da produção
+    if (canProductionBeEmpty(prod)):
+      return {
+        'tokenIndex': tokenIndex,
+      }
     raise Exception('Não encotrada produção adequada');
   
   rule: Rule = prod[productionIndex];                                         # Define a regra de produção a ser usada
@@ -88,7 +103,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
 
   for to in rule:
     if (tokenIndex >= len(tokens)):
-      if (canBeEmpty(to)):                                                   # Se a produção pode ser vazia e não há mais tokens 
+      if (canRuleBeEmpty(to)):                                                   # Se a produção pode ser vazia e não há mais tokens 
         tokenIndex = tokenIndex + 1;                                         # Icrement o token, pois a execução do loop vai ser interrompida
         continue;                                                            # Pula para a proxima iteração do loop
       errmsg = "Esperado: " + to + " mas encotrado fim de arquivo (EOF)";
@@ -108,7 +123,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
         raise Exception(msg);
     elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
-      print("Passado del");                                                  # ao valor esperao
+      print("Passado: ", to);                                                  # ao valor esperao
     else:                                                                    # se não for, lança erro
       raise Exception('Esperado ' + to + " mas recebido: " + lookahead.value);
     tokenIndex = tokenIndex + 1;
