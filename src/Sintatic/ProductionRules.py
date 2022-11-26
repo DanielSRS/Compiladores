@@ -10,6 +10,9 @@ REL = [['!='], ['=='], ['<'], ['<='], ['>'], ['>='], ['=']];
 # Valor booleano
 Boolean = [['true'], ['false']];
 
+# Soma ou subtração
+SimboloSomaSub = [['+'], ['-']];
+
 comp = [['-IDE', '.', '-IDE']];
 
 # Matriz
@@ -30,4 +33,5 @@ map: Mapped = {
   '<Indice>': Indice,
   '<REL>': REL,
   '<Boolean>': Boolean,
+  '<SimboloSomaSub>': SimboloSomaSub,
 };
