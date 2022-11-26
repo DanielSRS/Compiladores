@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional, TypedDict
-
+from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
+from Sintatic.ProductionRules import map, ProductionRules, Rule, Matriz
 
 Rule = List[str];
 ProductionRules = List[Rule];
