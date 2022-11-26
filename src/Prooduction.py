@@ -9,7 +9,7 @@ t_comp = [Token('IDE', 1, 0, 2, 'mat'),
 
 
 def isNonTerminal(token: str):
-  if (token[0] == '<'):
+  if (token[0] == '<' and token[len(token) - 1] == '>'):
     return True;
   return False;
 
