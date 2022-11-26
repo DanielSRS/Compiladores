@@ -22,6 +22,31 @@ def isNonTerminal(token: str):
     return True;
   return False;
 
+# Dado as regras de uma produção, retorna
+# o conjunto fisrt dessa produção.
+#
+# O conjuto first é uma lista de listas de string,
+# onde cada lista de string representa o conjunto fisrt 
+# uma das regras da produção. dado que 
+# Cada produção é formada por uma ou mais regras
+def getFists(productionRules: ProductionRules):
+  #para cada regra da produção, retorna uma lista de strings
+  conjuntoFisrt: List[List[str]] = [];
+  for rule in productionRules:
+    if (len(rule) == 0):                              # Se for uma produção vazia
+      conjuntoFisrt.append([""]);                     # coloca uma string varia no conjunto first
+    elif (isNonTerminal(rule[0])):                    # se o primerio elemento for um não terminal
+      elemProduction = map.get(rule[0]);              # Busca a produção desse não terminal
+      if (elemProduction == None):                    # Se a procução não existe
+        raise Exception("Produção inexistente");      # Há um erro
+      l: List[str] = [];
+      for lst in getFists(elemProduction):            # Encontra o conjunto fist da produção
+        l.extend(lst);                                # Transforma em uma unica lista de string
+      conjuntoFisrt.append(l);                        # Adiciona lista ao conjuto da prudção atual
+    else:                                             # Se form um terminal
+      conjuntoFisrt.append([rule[0]]);
+  return conjuntoFisrt;                               # Retorna o conjunto encontrado
+
 
 def Production(prod: ProductionRules, tokens: 'list[Token]'):
   errors: list[str] = [];
