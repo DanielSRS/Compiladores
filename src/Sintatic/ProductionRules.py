@@ -13,6 +13,9 @@ Boolean = [['true'], ['false']];
 # Soma ou subtração
 SimboloSomaSub = [['+'], ['-']];
 
+# Operavel
+Operavel = [['-IDE'], ['-NRO']];
+
 comp = [['-IDE', '.', '-IDE']];
 
 # Matriz
@@ -34,4 +37,5 @@ map: Mapped = {
   '<REL>': REL,
   '<Boolean>': Boolean,
   '<SimboloSomaSub>': SimboloSomaSub,
+  '<Operavel>': Operavel,
 };
