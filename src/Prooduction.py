@@ -2,33 +2,10 @@ from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
 from Sintatic.ProductionRules import map, ProductionRules, Rule, Matriz
 
-Rule = List[str];
-ProductionRules = List[Rule];
-
-
-comp = [['-IDE', '.', '-IDE']];
-
-#Matriz
-Matriz = [['-IDE', '<DimensoesDeAcesso>']];
-DimensoesDeAcesso = [['<Access>', '<end>']];
-Access = [['[', '<Indice>', ']']];
-end = [['<Access>'], []];
-Indice = [['-NRO'], ['-IDE']];
-
-Mapped = Dict[str, ProductionRules]
-
-map: Mapped = {
-  '<Comp>': comp,
-  '<Matriz>': Matriz,
-  '<DimensoesDeAcesso>' : DimensoesDeAcesso,
-  '<Access>': Access,
-  '<end>': end,
-  '<Indice>': Indice,
-};
-
-t_comp = [Token('IDE', 1, 0, 2, 'val'),
-          Token('DEL', 1, 0, 2, '.'),
-          Token('IDE', 1, 0, 2, 'val')]
+t_comp = [Token('IDE', 1, 0, 2, 'mat'),
+          Token('DEL', 1, 0, 2, '['),
+          Token('NRO', 1, 0, 2, '5'),
+          Token('DEL', 1, 0, 2, ']')]
 
 
 def isNonTerminal(token: str):
@@ -141,4 +118,4 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
 
   
 if __name__ == "__main__":
-  Production(comp, t_comp);
+  Production(Matriz, t_comp);
