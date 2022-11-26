@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypedDict
 
 from TokenUtils.Token import Token
 
@@ -67,8 +67,10 @@ def chooseProduction(production: ProductionRules, token: Token) -> Optional[int]
     if "-" + token.token in listOffists:
       return index;
 
+class ProductionRes(TypedDict):
+  tokenIndex: int
 
-def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0):
+def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0) -> ProductionRes:
   errors: list[str] = [];                                                     # Lista de erros entontrados
   tokenIndex = initialTokenindex;                                             # Index do token lido
   if (len(tokens) < 1):                                                       # Se não houver mais tokens
@@ -93,25 +95,24 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
     if (isNonTerminal(to)):                                                  # Se for um não terminal
       p = map.get(to);                                                       # Encontra a produção para esse não terminal
       if (p == None):                                                        # Erro caso  a produção não exista
-        print("Produção inexistente!!");
-        return;
-      Production(p, tokens);
+        raise Exception("Produção inexistente!!");
+      res = Production(p, tokens);
+      tokenIndex = res['tokenIndex'] - 1;
     
-    elif (isSemiTerminal(to)):                                                 # Se for um terminal, cujo valor do token não é importante
+    elif (isSemiTerminal(to)):                                               # Se for um terminal, cujo valor do token não é importante
       if (matchSemiterminal(lookahead.token, to)):                           # verifica o apenas se o tipo do token é o esperado
         print("Passado ", to);
       else:
-        print('Erro na ver do token');
+        msg = "Esperado: " + to + " mas recebido" + lookahead.token;
+        raise Exception(msg);
     elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
       print("Passado del");                                                  # ao valor esperao
     else:                                                                    # se não for, lança erro
       errors.append('teve erro');
     tokenIndex = tokenIndex + 1;
-  if (len(errors) == 0):
-    print("Passed!");
-  else:
-    for e in errors:
-      print(e);
+  return {
+    'tokenIndex': tokenIndex,
+  };
 
   
 if __name__ == "__main__":
