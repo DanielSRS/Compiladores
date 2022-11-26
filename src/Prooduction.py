@@ -8,10 +8,22 @@ ProductionRules = List[Rule];
 
 comp = [['-IDE', '.', '-IDE']];
 
+#Matriz
+Matriz = [['-IDE', '<DimensoesDeAcesso>']];
+DimensoesDeAcesso = [['<Access>', '<end>']];
+Access = [['[', '<Indice>', ']']];
+end = [['<Access>'], []];
+Indice = [['-NRO'], ['-IDE']];
+
 Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
   '<Comp>': comp,
+  '<Matriz>': Matriz,
+  '<DimensoesDeAcesso>' : DimensoesDeAcesso,
+  '<Access>': Access,
+  '<end>': end,
+  '<Indice>': Indice,
 };
 
 t_comp = [Token('IDE', 1, 0, 2, 'val'),
@@ -108,7 +120,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
     elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
       print("Passado del");                                                  # ao valor esperao
     else:                                                                    # se não for, lança erro
-      errors.append('teve erro');
+      raise Exception('Esperado ' + to + " mas recebido: " + lookahead.value);
     tokenIndex = tokenIndex + 1;
   return {
     'tokenIndex': tokenIndex,
