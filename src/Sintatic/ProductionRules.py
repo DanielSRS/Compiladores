@@ -16,6 +16,13 @@ SimboloSomaSub = [['+'], ['-']];
 # Operavel
 Operavel = [['-IDE'], ['-NRO']];
 
+# Expressao Aritmetica
+Expressao = [['<ExpressaoMulti>', '<ExpressaoComMult>']];
+ExpressaoComMult = [['<SimboloSomaSub>','<Expressao>'], []];
+ExpressaoMulti =[['<Valor>', '<ExpressaoMultiComValor>']];
+ExpressaoMultiComValor = [['*', '<ExpressaoMulti>'], ['/', '<ExpressaoMulti>'], []]
+Valor = [['<Operavel>'],['(', '<Expressao>', ')']];
+
 # Matriz
 Matriz = [['-IDE', '<DimensoesDeAcesso>']];
 DimensoesDeAcesso = [['<Access>', '<end>']];
@@ -73,4 +80,9 @@ map: Mapped = {
   '<ParametroComIDE>': ParametroComIDE,
   '<MultiplosParametros>': MultiplosParametros,
   '<ChamadaFuncao>': ChamadaFuncao,
+  '<Expressao>': Expressao,
+  '<ExpressaoMulti>': ExpressaoMulti,
+  '<Valor>': Valor,
+  '<ExpressaoMultiComValor>': ExpressaoMultiComValor,
+  '<ExpressaoComMult>': ExpressaoComMult,
 };

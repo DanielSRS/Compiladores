@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao
 
 
 # Testes relacionais
@@ -225,6 +225,40 @@ t_chamada = [
   Token('DEL', 1, 0, 2, ';'),
 ]
 
+# Expressão aritimetica
+t_aritimetic_IDE_Plus_NRO = [
+  Token('IDE', 1, 0, 2, 'aritimetic_value'),
+  Token('ART', 1, 0, 2, '+'),
+  Token('NRO', 1, 0, 2, '45'),
+]
+t_aritimetic_NRO_Plus_NRO = [
+  Token('NRO', 1, 0, 2, '12'),
+  Token('ART', 1, 0, 2, '+'),
+  Token('NRO', 1, 0, 2, '98'),
+]
+t_aritimetic_IDE_Mult_IDE = [
+  Token('NRO', 1, 0, 2, 'valor_ide'),
+  Token('ART', 1, 0, 2, '*'),
+  Token('NRO', 1, 0, 2, 'parcela'),
+]
+t_aritimetic_Mix = [
+  Token('IDE', 1, 0, 2, 'valor_ide'),
+  Token('ART', 1, 0, 2, '+'),
+  Token('NRO', 1, 0, 2, '54'),
+  Token('ART', 1, 0, 2, '/'),
+  Token('NRO', 1, 0, 2, '65'),
+  Token('ART', 1, 0, 2, '*'),
+  Token('IDE', 1, 0, 2, 'idefa'),
+  Token('ART', 1, 0, 2, '+'),
+  Token('IDE', 1, 0, 2, 'lkej'),
+  Token('ART', 1, 0, 2, '/'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('NRO', 1, 0, 2, '3'),
+  Token('ART', 1, 0, 2, '-'),
+  Token('NRO', 1, 0, 2, '6'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -414,3 +448,10 @@ if __name__ == "__main__":
   # Testes de chamada de função ou procedimento
   print("------ ChamadaFuncao ------");
   Production(ChamadaFuncao, t_chamada);
+
+  # Testes de operaçãoes aritimeticas
+  print("------ Expressao ------");
+  Production(Expressao, t_aritimetic_IDE_Plus_NRO);
+  Production(Expressao, t_aritimetic_NRO_Plus_NRO);
+  Production(Expressao, t_aritimetic_IDE_Mult_IDE);
+  Production(Expressao, t_aritimetic_Mix);
