@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao, ExpressaoRelacional
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao, ExpressaoRelacional, ExpressaoLogica
 
 
 # Testes relacionais
@@ -259,6 +259,7 @@ t_aritimetic_Mix = [
   Token('DEL', 1, 0, 2, ')'),
 ]
 
+# Expressao relacional
 t_relational = [
   Token('DEL', 1, 0, 2, '('),
   Token('IDE', 1, 0, 2, 'v'),
@@ -269,6 +270,27 @@ t_relational = [
   Token('NRO', 1, 0, 2, '65'),
 ]
 
+# Expressão logica
+t_logic = [
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'v'),
+  Token('ART', 1, 0, 2, '>'),
+  Token('NRO', 1, 0, 2, '-10'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('LOG', 1, 0, 2, '&&'),
+  Token('IDE', 1, 0, 2, 'b'),
+  Token('LOG', 1, 0, 2, '||'),
+  Token('LOG', 1, 0, 2, '!'),
+  Token('IDE', 1, 0, 2, 'c'),
+  Token('REL', 1, 0, 2, '!='),
+  Token('IDE', 1, 0, 2, 'k'),
+  Token('LOG', 1, 0, 2, '&&'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('NRO', 1, 0, 2, '7'),
+  Token('ART', 1, 0, 2, '<'),
+  Token('NRO', 1, 0, 2, '5'),
+]
+
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -276,7 +298,7 @@ def isNonTerminal(token: str):
   return False;
 
 def isSemiTerminal(sm: str):
-  semis = { '-IDE', '-NRO', '-CAC' };
+  semis = { '-IDE', '-NRO', '-CAC', '-LOG', '-ART' };
   if sm in semis:
     return True;
   return False;
@@ -469,3 +491,7 @@ if __name__ == "__main__":
   # Testes de operaçãoes relacionais
   print("------ ExpressaoRelacional ------");
   Production(ExpressaoRelacional, t_relational);
+
+  # Testes de expressões lógicas
+  print("------ ExpressaoLogica ------");
+  Production(ExpressaoLogica, t_logic);

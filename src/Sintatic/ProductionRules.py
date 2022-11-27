@@ -25,7 +25,17 @@ Valor = [['<Operavel>'],['(', '<Expressao>', ')']];
 
 # Expressaõ relacional
 ExpressaoRelacional = [['<ValorRelacional>', '<REL>', '<ValorRelacional>'], []]
-ValorRelacional = [['-IDE'], ['-NRO'], ['-CAC'], ['<RetornoFuncao>'], ['(', '<ExpressaoRelacional>', ')'], ['<Matriz>'], ['<Boolean>'], ['<Comp>'], ['(', '<Expressao>', ')']]; # ['(', '<ExpressaoLogica>', ')']
+ValorRelacional = [['-IDE', '<ValorRelacionalComIDE>'], ['-NRO'], ['-CAC'], ['(', '<ValorRelacionalComParentesis>'], ['<Boolean>']];
+ValorRelacionalComIDE = [['(', '<ParametrosOpcionais>', ')'], ['.', '-IDE'], ['<DimensoesDeAcesso>'], []];
+ValorRelacionalComParentesis = [['<ExpressaoRelacional>', ')'], ['<Expressao>', ')'], ['<ExpressaoLogica>', ')']];
+
+# Expressão logica
+ExpressaoLogica = [['<neg>', '<OperadorLogico>', '<Expressao Opcional>']];
+ExpressaoOpcional = [['<op>', '<neg>', '<Expressao Opcional>'], []];
+op = [['&&', '||']];
+neg = [['<Negacao>'], ['<ValorRelacional>']];
+OperadorLogico = [['&&', '<neg>'], ['||', '<neg>']];
+Negacao = [['!', '<ValorRelacional>']];
 
 # Matriz
 Matriz = [['-IDE', '<DimensoesDeAcesso>']];
@@ -91,4 +101,12 @@ map: Mapped = {
   '<ExpressaoComMult>': ExpressaoComMult,
   '<ExpressaoRelacional>': ExpressaoRelacional,
   '<ValorRelacional>': ValorRelacional,
+  '<ExpressaoLogica>': ExpressaoLogica,
+  '<Expressao Opcional>': ExpressaoOpcional,
+  '<op>': op,
+  '<neg>': neg,
+  '<OperadorLogico>': OperadorLogico,
+  '<Negacao>': Negacao,
+  '<ValorRelacionalComIDE>': ValorRelacionalComIDE,
+  '<ValorRelacionalComParentesis>': ValorRelacionalComParentesis,
 };
