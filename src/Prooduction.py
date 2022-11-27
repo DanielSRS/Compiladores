@@ -1,11 +1,131 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, Matriz
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read
 
-t_comp = [Token('IDE', 1, 0, 2, 'mat'),
-          Token('DEL', 1, 0, 2, '['),
-          Token('NRO', 1, 0, 2, '5'),
-          Token('DEL', 1, 0, 2, ']')]
+
+# Testes relacionais
+t_rel_diff = [Token('REL', 1, 0, 2, '!=')];
+t_rel_eq = [Token('REL', 1, 0, 2, '==')];
+t_rel_lt = [Token('REL', 1, 0, 2, '<')];
+t_rel_leq = [Token('REL', 1, 0, 2, '<=')];
+t_rel_gt = [Token('REL', 1, 0, 2, '>')];
+t_rel_geq = [Token('REL', 1, 0, 2, '>=')];
+t_rel_atr = [Token('REL', 1, 0, 2, '=')];
+
+# Testes booleanos
+t_bool_true = [Token('PRE', 1, 0, 2, 'true')];
+t_bool_false = [Token('PRE', 1, 0, 2, 'false')];
+
+# Testes operadores de soma e subtração
+t_somasub_soma = [Token('ART', 1, 0, 2, '+')];
+t_somasub_sub = [Token('ART', 1, 0, 2, '-')];
+
+# Testes operavel
+t_operavel_IDE = [Token('IDE', 1, 0, 2, 'identificador')];
+t_operavel_NRO = [Token('NRO', 1, 0, 2, '78554')];
+
+# Testes matriz
+t_matrix_single_nro = [
+  Token('IDE', 1, 0, 2, 'mat'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('NRO', 1, 0, 2, '61'),
+  Token('DEL', 1, 0, 2, ']'),
+]
+t_matrix_single_IDE = [
+  Token('IDE', 1, 0, 2, 'mat'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'identificador'),
+  Token('DEL', 1, 0, 2, ']'),
+]
+t_matrix_multiplo = [
+  Token('IDE', 1, 0, 2, 'mat'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'identificador'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('NRO', 1, 0, 2, '61'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('NRO', 1, 0, 2, '61'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'identificador'),
+  Token('DEL', 1, 0, 2, ']'),
+]
+
+# Print
+t_print_IDE = [
+  Token('IDE', 1, 0, 2, 'print'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'identificador'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+t_print_CAC = [
+  Token('IDE', 1, 0, 2, 'print'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('CAC', 1, 0, 2, '"String"'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+t_print_Matriz = [
+  Token('IDE', 1, 0, 2, 'print'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'matrix'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('NRO', 1, 0, 2, '9'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'index'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+t_print_Comp = [
+  Token('IDE', 1, 0, 2, 'print'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'tipoComposto'),
+  Token('DEL', 1, 0, 2, '.'),
+  Token('IDE', 1, 0, 2, 'propriedade'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+
+# Tipo composto
+t_comp = [
+  Token('IDE', 1, 0, 2, 'TipoComposto'),
+  Token('DEL', 1, 0, 2, '.'),
+  Token('IDE', 1, 0, 2, 'atributo'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+
+# Teste read
+t_readt_IDE = [
+  Token('IDE', 1, 0, 2, 'read'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'identificador'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+t_read_Matriz = [
+  Token('IDE', 1, 0, 2, 'read'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'matrix'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'index'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+t_read_Comp = [
+  Token('IDE', 1, 0, 2, 'read'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'tipoComposto'),
+  Token('DEL', 1, 0, 2, '.'),
+  Token('IDE', 1, 0, 2, 'propriedade'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
 
 
 def isNonTerminal(token: str):
@@ -133,4 +253,50 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
 
   
 if __name__ == "__main__":
-  Production(Matriz, t_comp);
+  # Testes de operador relacional
+  print("------ Relacionais ------");
+  Production(REL, t_rel_eq);
+  Production(REL, t_rel_diff);
+  Production(REL, t_rel_geq);
+  Production(REL, t_rel_gt);
+  Production(REL, t_rel_leq);
+  Production(REL, t_rel_lt);
+  Production(REL, t_rel_atr);
+
+  # Testes booleanos
+  print("------ Booleanos ------");
+  Production(Boolean, t_bool_true);
+  Production(Boolean, t_bool_false);
+
+  # Testes operadores de soma e subtração
+  print("------ SomaSub ------");
+  Production(SimboloSomaSub, t_somasub_soma);
+  Production(SimboloSomaSub, t_somasub_sub);
+
+  # Testes operadores de soma e subtração
+  print("------ Operavel ------");
+  Production(Operavel, t_operavel_IDE);
+  Production(Operavel, t_operavel_NRO);
+
+  # Testes matriz
+  print("------ Matriz ------");
+  Production(Matriz, t_matrix_single_IDE);
+  Production(Matriz, t_matrix_single_nro);
+  Production(Matriz, t_matrix_multiplo);
+
+  # Testes matriz
+  print("------ Print ------");
+  Production(Print, t_print_CAC);
+  Production(Print, t_print_IDE);
+  Production(Print, t_print_Comp);
+  Production(Print, t_print_Matriz);
+
+  # Testes matriz
+  print("------ Tipo composto ------");
+  Production(comp, t_comp);
+
+  # Testes read
+  print("------ Print ------");
+  Production(Read, t_read_Comp);
+  Production(Read, t_read_Matriz);
+  Production(Read, t_readt_IDE);
