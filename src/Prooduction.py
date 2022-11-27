@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao
 
 
 # Testes relacionais
@@ -125,6 +125,96 @@ t_read_Comp = [
   Token('IDE', 1, 0, 2, 'propriedade'),
   Token('DEL', 1, 0, 2, ')'),
   Token('DEL', 1, 0, 2, ';'),
+]
+
+# Retorno função
+t_retunFunction_empty = [
+  Token('IDE', 1, 0, 2, 'fun'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_1IDE = [
+  Token('IDE', 1, 0, 2, 'fun2'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'param1'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_2IDE = [
+  Token('IDE', 1, 0, 2, 'fun5'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'param1'),
+  Token('DEL', 1, 0, 2, ','),
+  Token('IDE', 1, 0, 2, 'param2'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_NRO = [
+  Token('IDE', 1, 0, 2, 'fun3'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('NRO', 1, 0, 2, '45'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_CAC = [
+  Token('IDE', 1, 0, 2, 'fun4'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('CAC', 1, 0, 2, '"string  jksjlf"'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_Matriz = [
+  Token('IDE', 1, 0, 2, 'fun6'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'acessoMatrix'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('NRO', 1, 0, 2, '132'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_comp = [
+  Token('IDE', 1, 0, 2, 'fun7'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'struct'),
+  Token('DEL', 1, 0, 2, '.'),
+  Token('IDE', 1, 0, 2, 'prop'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_retunFunction1 = [
+  Token('IDE', 1, 0, 2, 'fun8'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'myFunctionCall'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_retunFunction2 = [
+  Token('IDE', 1, 0, 2, 'fun9'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'read'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'matrix'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'index'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ')'),
+]
+t_retunFunction_multiple = [
+  Token('IDE', 1, 0, 2, 'fun9'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'read'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'matrix'),
+  Token('DEL', 1, 0, 2, '['),
+  Token('IDE', 1, 0, 2, 'index'),
+  Token('DEL', 1, 0, 2, ']'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ','),
+  Token('IDE', 1, 0, 2, 'param2'),
+  Token('DEL', 1, 0, 2, ','),
+  Token('CAC', 1, 0, 2, '"string  jksjlf"'),
+  Token('DEL', 1, 0, 2, ','),
+  Token('NRO', 1, 0, 2, '132'),
+  Token('DEL', 1, 0, 2, ','),
+  Token('NRO', 1, 0, 2, '132'),
+  Token('DEL', 1, 0, 2, ')'),
 ]
 
 
@@ -300,3 +390,15 @@ if __name__ == "__main__":
   Production(Read, t_read_Comp);
   Production(Read, t_read_Matriz);
   Production(Read, t_readt_IDE);
+
+  # Testes retorno de função
+  print("------ RetornoFuncao ------");
+  Production(RetornoFuncao, t_retunFunction_empty);
+  Production(RetornoFuncao, t_retunFunction_1IDE);
+  Production(RetornoFuncao, t_retunFunction_2IDE);
+  Production(RetornoFuncao, t_retunFunction_NRO);
+  Production(RetornoFuncao, t_retunFunction_CAC);
+  Production(RetornoFuncao, t_retunFunction_Matriz);
+  Production(RetornoFuncao, t_retunFunction_comp);
+  Production(RetornoFuncao, t_retunFunction_retunFunction1);
+  Production(RetornoFuncao, t_retunFunction_retunFunction2);

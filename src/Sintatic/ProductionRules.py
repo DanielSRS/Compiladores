@@ -36,6 +36,14 @@ Read = [['read', '(', '<Ler>', ')', ';']];
 Ler = [['-IDE', '<LerComIDE>']];
 LerComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], []];
 
+# Chamada funcção
+RetornoFuncao = [['-IDE', '(', '<ParametrosOpcionais>', ')']]
+ParametrosOpcionais = [['<ListaDeParametros>'], []];
+ListaDeParametros = [['<Parametro>', '<MultiplosParametros>']];
+MultiplosParametros = [[',', '<ListaDeParametros>'], []];
+Parametro = [['-IDE', '<ParametroComIDE>'], ['-NRO'], ['-CAC']];
+ParametroComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], ['(', '<ParametrosOpcionais>', ')'], []];
+
 Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
@@ -55,4 +63,10 @@ map: Mapped = {
   '<Read>': Read,
   '<Ler>': Ler,
   '<LerComIDE>': LerComIDE,
+  '<RetornoFuncao>': RetornoFuncao,
+  '<ParametrosOpcionais>': ParametrosOpcionais,
+  '<ListaDeParametros>': ListaDeParametros,
+  '<Parametro>': Parametro,
+  '<ParametroComIDE>': ParametroComIDE,
+  '<MultiplosParametros>': MultiplosParametros,
 };
