@@ -44,6 +44,9 @@ MultiplosParametros = [[',', '<ListaDeParametros>'], []];
 Parametro = [['-IDE', '<ParametroComIDE>'], ['-NRO'], ['-CAC']];
 ParametroComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], ['(', '<ParametrosOpcionais>', ')'], []];
 
+# Chamada de função ou procedimento
+ChamadaFuncao = [['<RetornoFuncao>', ';']];
+
 Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
@@ -69,4 +72,5 @@ map: Mapped = {
   '<Parametro>': Parametro,
   '<ParametroComIDE>': ParametroComIDE,
   '<MultiplosParametros>': MultiplosParametros,
+  '<ChamadaFuncao>': ChamadaFuncao,
 };

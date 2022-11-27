@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao
 
 
 # Testes relacionais
@@ -217,6 +217,14 @@ t_retunFunction_multiple = [
   Token('DEL', 1, 0, 2, ')'),
 ]
 
+# Cahamada função ou procedimento
+t_chamada = [
+  Token('IDE', 1, 0, 2, 'function_ou_procedure'),
+  Token('DEL', 1, 0, 2, '('),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('DEL', 1, 0, 2, ';'),
+]
+
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -402,3 +410,7 @@ if __name__ == "__main__":
   Production(RetornoFuncao, t_retunFunction_comp);
   Production(RetornoFuncao, t_retunFunction_retunFunction1);
   Production(RetornoFuncao, t_retunFunction_retunFunction2);
+
+  # Testes de chamada de função ou procedimento
+  print("------ ChamadaFuncao ------");
+  Production(ChamadaFuncao, t_chamada);
