@@ -14,7 +14,7 @@ def isNonTerminal(token: str):
   return False;
 
 def isSemiTerminal(sm: str):
-  semis = { '-IDE', '-NRO' };
+  semis = { '-IDE', '-NRO', '-CAC' };
   if sm in semis:
     return True;
   return False;

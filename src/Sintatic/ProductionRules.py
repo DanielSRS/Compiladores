@@ -16,14 +16,20 @@ SimboloSomaSub = [['+'], ['-']];
 # Operavel
 Operavel = [['-IDE'], ['-NRO']];
 
-comp = [['-IDE', '.', '-IDE']];
-
 # Matriz
 Matriz = [['-IDE', '<DimensoesDeAcesso>']];
 DimensoesDeAcesso = [['<Access>', '<end>']];
 Access = [['[', '<Indice>', ']']];
 end = [['<Access>'], []];
 Indice = [['-NRO'], ['-IDE']];
+
+# Print
+Print = [['print', '(', '<ConteudoDoPrint>', ')', ';']];
+ConteudoDoPrint = [['-IDE', '<ConteudoDoPrintComIDE>'], ['-CAC']];
+ConteudoDoPrintComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], []];
+
+# Tipo composto
+comp = [['-IDE', '.', '-IDE']];
 
 Mapped = Dict[str, ProductionRules]
 
@@ -38,4 +44,7 @@ map: Mapped = {
   '<Boolean>': Boolean,
   '<SimboloSomaSub>': SimboloSomaSub,
   '<Operavel>': Operavel,
+  '<Print>': Print,
+  '<ConteudoDoPrint>': ConteudoDoPrint,
+  '<ConteudoDoPrintComIDE>': ConteudoDoPrintComIDE,
 };
