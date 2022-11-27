@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao
+from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao, ExpressaoRelacional
 
 
 # Testes relacionais
@@ -259,6 +259,16 @@ t_aritimetic_Mix = [
   Token('DEL', 1, 0, 2, ')'),
 ]
 
+t_relational = [
+  Token('DEL', 1, 0, 2, '('),
+  Token('IDE', 1, 0, 2, 'v'),
+  Token('ART', 1, 0, 2, '>'),
+  Token('NRO', 1, 0, 2, '-10'),
+  Token('DEL', 1, 0, 2, ')'),
+  Token('ART', 1, 0, 2, '='),
+  Token('NRO', 1, 0, 2, '65'),
+]
+
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -455,3 +465,7 @@ if __name__ == "__main__":
   Production(Expressao, t_aritimetic_NRO_Plus_NRO);
   Production(Expressao, t_aritimetic_IDE_Mult_IDE);
   Production(Expressao, t_aritimetic_Mix);
+
+  # Testes de operaçãoes relacionais
+  print("------ ExpressaoRelacional ------");
+  Production(ExpressaoRelacional, t_relational);

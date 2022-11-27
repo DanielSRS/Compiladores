@@ -23,6 +23,10 @@ ExpressaoMulti =[['<Valor>', '<ExpressaoMultiComValor>']];
 ExpressaoMultiComValor = [['*', '<ExpressaoMulti>'], ['/', '<ExpressaoMulti>'], []]
 Valor = [['<Operavel>'],['(', '<Expressao>', ')']];
 
+# Expressaõ relacional
+ExpressaoRelacional = [['<ValorRelacional>', '<REL>', '<ValorRelacional>'], []]
+ValorRelacional = [['-IDE'], ['-NRO'], ['-CAC'], ['<RetornoFuncao>'], ['(', '<ExpressaoRelacional>', ')'], ['<Matriz>'], ['<Boolean>'], ['<Comp>'], ['(', '<Expressao>', ')']]; # ['(', '<ExpressaoLogica>', ')']
+
 # Matriz
 Matriz = [['-IDE', '<DimensoesDeAcesso>']];
 DimensoesDeAcesso = [['<Access>', '<end>']];
@@ -85,4 +89,6 @@ map: Mapped = {
   '<Valor>': Valor,
   '<ExpressaoMultiComValor>': ExpressaoMultiComValor,
   '<ExpressaoComMult>': ExpressaoComMult,
+  '<ExpressaoRelacional>': ExpressaoRelacional,
+  '<ValorRelacional>': ValorRelacional,
 };
