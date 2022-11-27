@@ -31,6 +31,11 @@ ConteudoDoPrintComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], []];
 # Tipo composto
 comp = [['-IDE', '.', '-IDE']];
 
+# Read
+Read = [['read', '(', '<Ler>', ')', ';']];
+Ler = [['-IDE', '<LerComIDE>']];
+LerComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], []];
+
 Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
@@ -47,4 +52,7 @@ map: Mapped = {
   '<Print>': Print,
   '<ConteudoDoPrint>': ConteudoDoPrint,
   '<ConteudoDoPrintComIDE>': ConteudoDoPrintComIDE,
+  '<Read>': Read,
+  '<Ler>': Ler,
+  '<LerComIDE>': LerComIDE,
 };
