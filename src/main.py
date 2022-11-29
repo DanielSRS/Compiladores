@@ -1,3 +1,5 @@
+from Prooduction import Production
+from Sintatic.ProductionRules import Inicio
 from TokenUtils.Token import Token
 from TokenUtils.orderTokens import isError, orderTokens
 from automata.findTokensInStringAutomata import findTokensInStringAutomata
@@ -52,6 +54,8 @@ def lexico():
     outputFile.writelines(tokenListPerFile[filename])
     source_file.close();
     outputFile.close();
+    if (errorsNum == 0):
+      Production(Inicio, tokensFound);
   return;
 
 lexico();

@@ -68,6 +68,59 @@ ParametroComIDE = [['<DimensoesDeAcesso>'], ['.', '-IDE'], ['(', '<ParametrosOpc
 # Chamada de função ou procedimento
 ChamadaFuncao = [['<RetornoFuncao>', ';']];
 
+# Bloco
+Bloco = [['{,' '<Conteudos>', '}']]
+Conteudos = [['<ConteudoDeBloco>', '<Conteudos>'], []]
+ConteudoDeBloco = [['<Expressao>', ';'], ['<ExpressaoRelacional>', ';'], ['<ExpressaoLogica>', ';'], ['<Matriz>', ';'], ['<Print>'], ['<Read>'], ['<ChamadaFuncao>'], ['<If>'], ['<VarDeclaracao>'], ['<While>']]
+
+# While Verificar expressao
+While = [['while', '(', '<Exp>', ')', '<Bloco>' ]]  
+Exp = [['<ExpressaoLogica>'], ['<Boolean>'], ['<ExpressaoRelacional>']]
+
+# If
+If = [['if', '(', '<Exp>', ')', 'then', '<ConteudoDoIf>']]
+ConteudoDoIf = [['<Bloco>'], ['<Bloco>', 'else', '<Bloco>']]
+
+# Declaração de função   ps: lista de parmeteros ta errada  
+Funcao = [['function', '<Tipo>', '-IDE', '(', '<ListParametros>', ')', '<functionReturn>']]
+functionReturn = [['{', '<Conteudos>', 'return', '<ValorRelacional>', ';' '}']]
+ListParametros = [['<Parametro>'], ['<Parametro>', ',', '<ListParametros>'], []]
+Parametro = [['<Tipo>', '-IDE']]
+                 
+# Tipo
+Tipo = [['int'], ['real'], ['boolean'], ['string'], ['-IDE']]
+
+# Procedimento
+Procedimento = [['procedure', '-IDE', '(', '<ListParametros>', ')', '<Bloco>']]
+
+# Variaveis globais
+VarDeclaracao = [['var', '{', '<todasAsVars>', '}']]
+Constantes = [['const', '{', '<todasAsVars>', '}']]
+todasAsVars = [['<dvar>', '<todasAsVars>'], ['<dvar>']]
+
+# Declaração de tipo composto
+DeclaracaoStruct = [['struct', '-IDE', '{', '<todasAsVars>', '}']]
+
+# Declaração de variavel
+dvar = [['<Tipo>', '<varList>', ';']]
+varList = [['-IDE', '<attopt>', ',', '<varList>'], ['-IDE', '<attopt>']]
+attopt = [['=', '<ValorRelacional>'], []]
+
+          
+# Extends
+Extendstc = [['-IDE', 'extends', '-IDE', '{', '<todasAsVars>', '}']]
+         
+Estrutura = [['<compOpt>', '<extOpt>', '<varOpt>', '<constOpt>', '<funcoes>']]
+varOpt = [['<VarDeclaracao>'], []]
+constOpt = [['<Constantes>'], []]
+compOpt = [['<DeclaracaoStruct>', '<compOpt>'], []]
+extOpt = [['<Extendstc>', '<extOpt>'], []]
+funcoes = [['<funOuProc>', '<funcoes>'], ['<funOuProc>']]
+funOuProc = [['<Funcao>'], ['<Procedimento>']]
+           
+Inicio = [['<Estrutura>']]
+         
+
 Mapped = Dict[str, ProductionRules]
 
 map: Mapped = {
@@ -109,4 +162,35 @@ map: Mapped = {
   '<Negacao>': Negacao,
   '<ValorRelacionalComIDE>': ValorRelacionalComIDE,
   '<ValorRelacionalComParentesis>': ValorRelacionalComParentesis,
+
+  '<Bloco>': Bloco,
+  '<Conteudos>': Conteudos,
+  '<ConteudoDeBloco>': ConteudoDeBloco,
+  '<While>': While,
+  '<Exp>': Exp,
+  '<If>': If,
+  '<ConteudoDoIf>': ConteudoDoIf,
+  '<Funcao>': Funcao,
+  '<functionReturn>': functionReturn,
+  '<ListParametros>': ListParametros,
+  '<Parametro>': Parametro,
+  '<Tipo>': Tipo,
+  '<Procedimento>': Procedimento,
+  '<VarDeclaracao>': VarDeclaracao,
+  '<Constantes>': Constantes,
+  '<todasAsVars>': todasAsVars,
+  '<DeclaracaoStruct>': DeclaracaoStruct,
+  '<dvar>': dvar,
+  '<varList>': varList,
+  '<attopt>': attopt,
+  '<Extendstc>': Extendstc,
+  '<Estrutura>': Estrutura,
+
+  '<varOpt>': varOpt,
+  '<constOpt>': constOpt,
+  '<compOpt>': compOpt,
+  '<extOpt>': extOpt,
+  '<funcoes>': funcoes,
+  '<funOuProc>': funOuProc,
+  '<Inicio>': Inicio,
 };
