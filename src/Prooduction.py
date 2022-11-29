@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
-from Sintatic.ProductionRules import map, ProductionRules, Rule, REL, Boolean, SimboloSomaSub, Operavel, Matriz, Print, comp, Read, RetornoFuncao, ChamadaFuncao, Expressao, ExpressaoRelacional, ExpressaoLogica
+from Sintatic.ProductionRules import map, ProductionRules, Rule
 
 
 # Testes relacionais
@@ -298,7 +298,7 @@ def isNonTerminal(token: str):
   return False;
 
 def isSemiTerminal(sm: str):
-  semis = { '-IDE', '-NRO', '-CAC', '-LOG', '-ART' };
+  semis = { '-IDE', '-NRO', '-CAC', '-LOG', '-ART', '-PRE' };
   if sm in semis:
     return True;
   return False;
@@ -344,11 +344,21 @@ def getFists(productionRules: ProductionRules):
     elif (isNonTerminal(rule[0])):                    # se o primerio elemento for um não terminal
       elemProduction = map.get(rule[0]);              # Busca a produção desse não terminal
       if (elemProduction == None):                    # Se a procução não existe
-        raise Exception("Produção inexistente");      # Há um erro
+        raise Exception("Produção: ", rule[0], "inexistente");      # Há um erro
       l: List[str] = [];
       for lst in getFists(elemProduction):            # Encontra o conjunto fist da produção
         l.extend(lst);                                # Transforma em uma unica lista de string
       conjuntoFisrt.append(l);                        # Adiciona lista ao conjuto da prudção atual
+      #crbempty = canRuleBeEmpty(rule[0]);
+      #crbindex = 0
+      #if (crbempty and len(rule) > 1):
+      #  elemProduction = map.get(rule[1]);
+      #  if (elemProduction == None):                    # Se a procução não existe
+      #    raise Exception("Produção: ", rule[0], "inexistente");      # Há um erro
+      #  r: List[str] = [];
+      #  for st in getFists(elemProduction):            # Encontra o conjunto fist da produção
+      #    r.extend(st);                                # Transforma em uma unica lista de string
+      #  conjuntoFisrt.append(r); 
     else:                                             # Se form um terminal
       conjuntoFisrt.append([rule[0]]);
   return conjuntoFisrt;                               # Retorna o conjunto encontrado
@@ -395,20 +405,24 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
     lookahead = tokens[tokenIndex];
     if (isNonTerminal(to)):                                                  # Se for um não terminal
       p = map.get(to);                                                       # Encontra a produção para esse não terminal
-      if (p == None):                                                        # Erro caso  a produção não exista
+      if (p == None):      
+        print("\n\n-- produção tentado entcontrar");
+        print(to);                                                  # Erro caso  a produção não exista
         raise Exception("Produção inexistente!!");
       res = Production(p, tokens, tokenIndex);
       tokenIndex = res['tokenIndex'] - 1;
     
     elif (isSemiTerminal(to)):                                               # Se for um terminal, cujo valor do token não é importante
       if (matchSemiterminal(lookahead.token, to)):                           # verifica o apenas se o tipo do token é o esperado
-        print("Passado ", to);
+        print("Passado ", to, " - ", lookahead.value);
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
         raise Exception(msg);
     elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
-      print("Passado: ", to);                                                  # ao valor esperao
+      print("Passado: ", to, " - ", lookahead.value);                                                  # ao valor esperao
     else:                                                                    # se não for, lança erro
+      print(rule);
+      print(lookahead);
       raise Exception('Esperado ' + to + " mas recebido: " + lookahead.value);
     tokenIndex = tokenIndex + 1;
   return {
@@ -418,80 +432,4 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
   
 if __name__ == "__main__":
   # Testes de operador relacional
-  print("------ Relacionais ------");
-  Production(REL, t_rel_eq);
-  Production(REL, t_rel_diff);
-  Production(REL, t_rel_geq);
-  Production(REL, t_rel_gt);
-  Production(REL, t_rel_leq);
-  Production(REL, t_rel_lt);
-  Production(REL, t_rel_atr);
-
-  # Testes booleanos
-  print("------ Booleanos ------");
-  Production(Boolean, t_bool_true);
-  Production(Boolean, t_bool_false);
-
-  # Testes operadores de soma e subtração
-  print("------ SomaSub ------");
-  Production(SimboloSomaSub, t_somasub_soma);
-  Production(SimboloSomaSub, t_somasub_sub);
-
-  # Testes operadores de soma e subtração
-  print("------ Operavel ------");
-  Production(Operavel, t_operavel_IDE);
-  Production(Operavel, t_operavel_NRO);
-
-  # Testes matriz
-  print("------ Matriz ------");
-  Production(Matriz, t_matrix_single_IDE);
-  Production(Matriz, t_matrix_single_nro);
-  Production(Matriz, t_matrix_multiplo);
-
-  # Testes matriz
-  print("------ Print ------");
-  Production(Print, t_print_CAC);
-  Production(Print, t_print_IDE);
-  Production(Print, t_print_Comp);
-  Production(Print, t_print_Matriz);
-
-  # Testes matriz
-  print("------ Tipo composto ------");
-  Production(comp, t_comp);
-
-  # Testes read
-  print("------ Print ------");
-  Production(Read, t_read_Comp);
-  Production(Read, t_read_Matriz);
-  Production(Read, t_readt_IDE);
-
-  # Testes retorno de função
-  print("------ RetornoFuncao ------");
-  Production(RetornoFuncao, t_retunFunction_empty);
-  Production(RetornoFuncao, t_retunFunction_1IDE);
-  Production(RetornoFuncao, t_retunFunction_2IDE);
-  Production(RetornoFuncao, t_retunFunction_NRO);
-  Production(RetornoFuncao, t_retunFunction_CAC);
-  Production(RetornoFuncao, t_retunFunction_Matriz);
-  Production(RetornoFuncao, t_retunFunction_comp);
-  Production(RetornoFuncao, t_retunFunction_retunFunction1);
-  Production(RetornoFuncao, t_retunFunction_retunFunction2);
-
-  # Testes de chamada de função ou procedimento
-  print("------ ChamadaFuncao ------");
-  Production(ChamadaFuncao, t_chamada);
-
-  # Testes de operaçãoes aritimeticas
-  print("------ Expressao ------");
-  Production(Expressao, t_aritimetic_IDE_Plus_NRO);
-  Production(Expressao, t_aritimetic_NRO_Plus_NRO);
-  Production(Expressao, t_aritimetic_IDE_Mult_IDE);
-  Production(Expressao, t_aritimetic_Mix);
-
-  # Testes de operaçãoes relacionais
-  print("------ ExpressaoRelacional ------");
-  Production(ExpressaoRelacional, t_relational);
-
-  # Testes de expressões lógicas
-  print("------ ExpressaoLogica ------");
-  Production(ExpressaoLogica, t_logic);
+  d = 54;
