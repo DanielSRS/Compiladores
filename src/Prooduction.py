@@ -314,15 +314,9 @@ def canRuleBeEmpty(rule: str):
   return False;
 
 def canProductionBeEmpty(production: ProductionRules):
-  res = False;
-  for rule in production:
-    if (len(rule) < 1):
-      res = True;
-      continue;
-    for r in rule:
-      if (canRuleBeEmpty(r)):
-        res = True;
-  return res;
+  for conjunto in getFists(production):
+    if "" in conjunto:
+      return True
 
 def matchSemiterminal(received: str, target: str):
   sanitazed = target[1:];
