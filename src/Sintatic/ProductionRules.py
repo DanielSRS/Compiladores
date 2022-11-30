@@ -173,7 +173,7 @@ OperandoRelacional = [['<ValorDeStribuicaoStruct>'], ['(', '<ExpressaoRelacional
 #! Se começar com negção então é logica
 AlgumaDasExpressoes = [
   ['!', '-IDE', '<Valor_Comecando_Com_IDE>', '<OperadorLogico>', '<Expressao Opcional>'], 
-  ['-IDE', '<Valor_Comecando_Com_IDE>',' <ADE_com_IDE_VALOR>'],
+  ['-IDE', '<Valor_Comecando_Com_IDE>', '<ADE_com_IDE_VALOR>'],
   ['-NRO', '<REL>', '<OperandoRelacional>',' <EXP_REL_Opcional>'],
   ['-CAC', '<REL>', '<OperandoRelacional>', '<EXP_REL_Opcional>'],
   ['<Boolean>', '<ADE_com_Bool>'],
@@ -189,9 +189,9 @@ ADE_com_Bool = [['<REL>', '<OperandoRelacional>', '<EXP_REL_Opcional>'], []]
 
 
 #! Declaração de uma função                        
-Funcao = [['function', '<Tipo>', '-IDE', '(', '<ListParametros>', ')', '{', '}']]
+Funcao = [['function', '<Tipo>', '-IDE', '(', '<ListParametros>', ')', '<BlocoDeCodigo>']]
 #! Lista de parametros pode ser vazia
-ListParametros = [['<Parametro>',' <OutroParametro>'], []]
+ListParametros = [['<Parametro>', '<OutroParametro>'], []]
 #! Se mais de um parametro
 OutroParametro = [[',', '<ListParametros>'], []]
 #! Definição do parametro
@@ -285,4 +285,5 @@ map: Mapped = {
   '<Tipo>': Tipo,
   '<Procedimento>': Procedimento,
   '<HasAnotherFuncOrProc>': HasAnotherFuncOrProc,
+  '<REL>': REL,
 };
