@@ -336,23 +336,19 @@ def getFists(productionRules: ProductionRules):
     if (len(rule) == 0):                              # Se for uma produção vazia
       conjuntoFisrt.append([""]);                     # coloca uma string varia no conjunto first
     elif (isNonTerminal(rule[0])):                    # se o primerio elemento for um não terminal
-      elemProduction = map.get(rule[0]);              # Busca a produção desse não terminal
-      if (elemProduction == None):                    # Se a procução não existe
-        raise Exception("Produção: ", rule[0], "inexistente");      # Há um erro
       l: List[str] = [];
-      for lst in getFists(elemProduction):            # Encontra o conjunto fist da produção
-        l.extend(lst);                                # Transforma em uma unica lista de string
-      conjuntoFisrt.append(l);                        # Adiciona lista ao conjuto da prudção atual
-      #crbempty = canRuleBeEmpty(rule[0]);
-      #crbindex = 0
-      #if (crbempty and len(rule) > 1):
-      #  elemProduction = map.get(rule[1]);
-      #  if (elemProduction == None):                    # Se a procução não existe
-      #    raise Exception("Produção: ", rule[0], "inexistente");      # Há um erro
-      #  r: List[str] = [];
-      #  for st in getFists(elemProduction):            # Encontra o conjunto fist da produção
-      #    r.extend(st);                                # Transforma em uma unica lista de string
-      #  conjuntoFisrt.append(r); 
+      nonEmpty = False;
+      for tokentype in rule:
+        if (nonEmpty):
+          continue;
+        elemProduction = map.get(tokentype);              # Busca a produção desse não terminal
+        if (elemProduction == None):                    # Se a procução não existe
+          raise Exception("Produção: ", tokentype, "inexistente");      # Há um erro
+        for lst in getFists(elemProduction):            # Encontra o conjunto fist da produção
+          l.extend(lst);                                # Transforma em uma unica lista de string
+        if (not canRuleBeEmpty(tokentype)):
+          nonEmpty = True;
+      conjuntoFisrt.append(l);                        # Adiciona lista ao conjuto da prudção atual 
     else:                                             # Se form um terminal
       conjuntoFisrt.append([rule[0]]);
   return conjuntoFisrt;                               # Retorna o conjunto encontrado
