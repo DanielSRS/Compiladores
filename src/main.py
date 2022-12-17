@@ -79,7 +79,7 @@ def lexico():
       Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSintaticState, 0);
 
       # Executa uma segunda vez para fazer a analise semantica usando a tabela populada na execução anterior
-      Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSemanticState, 0);
+      #Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSemanticState, 0);
       printSymbolTable();
   return;
 
