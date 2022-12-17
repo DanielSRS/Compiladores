@@ -8,6 +8,7 @@ symbolTable: SymbolTable = {};
 
 class SemanticState(TypedDict):
   fowardType: Optional[str];
+  declaringStruct: Optional[str];
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -85,7 +86,7 @@ class ProductionRes(TypedDict):
 def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str, state: Optional[SemanticState], initialTokenindex: int = 0) -> ProductionRes:
   # errors: list[str] = [];                                                   # Lista de erros entontrados
   tokenIndex = initialTokenindex;                                             # Index do token lido
-  currentState: SemanticState = state if not state == None else { 'fowardType': None }
+  currentState: SemanticState = state if not state == None else { 'fowardType': None, 'declaringStruct': None }
   if (len(tokens) < 1):                                                       # Se não houver mais tokens
     raise Exception("Não há tokens suficientes");
 
@@ -107,8 +108,8 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
 
 
 
-  #if (productionName == '<DeclaracaoDeVariavelDeStruct>'):
-  #  print('');
+  #if (productionName == '<DeclaracaoStruct>'):
+  #  currentState['declaringStruct'] = True;
 
   for to in rule:
     if (tokenIndex >= len(tokens)):
@@ -141,7 +142,10 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
           if (not currentState["fowardType"] == None):
             # Adicione o simbolo lido (lookahead.value) na tabela de simbolos como tendo
             # o dipo definido em currentState["fowardType"]
-            symbolTable[lookahead.value] = currentState["fowardType"];
+            if (not currentState['declaringStruct'] == None):
+              symbolTable[currentState['declaringStruct'] + '.' + lookahead.value] = currentState["fowardType"];
+            else:
+              symbolTable[lookahead.value] = currentState["fowardType"];
         
         # Se validando <Funcao>
         if (productionName == '<Funcao>'):
@@ -156,6 +160,10 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
           # Adicione o procedimento na tabela de simbolos e defina o tipo como Procedimento
           # pois procedimentos não tem retorno
           symbolTable[lookahead.value] = 'Procedimento';
+
+        # Se estiver declarando uma estrutura, salve o nome da estrutura
+        if (productionName == '<DeclaracaoStruct>'):
+          currentState['declaringStruct'] = lookahead.value;
           #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
@@ -172,6 +180,8 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
       print(lookahead);
       raise Exception('Esperado ' + to + " mas recebido: " + lookahead.value);
     tokenIndex = tokenIndex + 1;
+  if (productionName == '<DeclaracaoStruct>'):
+    currentState['declaringStruct'] = None;
   return {
     'tokenIndex': tokenIndex,
     "processedState": currentState,
