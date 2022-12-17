@@ -2,6 +2,13 @@ from typing import List, Optional, TypedDict
 from TokenUtils.Token import Token
 from Sintatic.ProductionRules import map, ProductionRules, Rule
 
+SymbolTable = dict[str, str];
+
+symbolTable: SymbolTable = {};
+
+class SemanticState(TypedDict):
+  fowardType: Optional[str];
+
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
     return True;
@@ -72,11 +79,13 @@ def chooseProduction(production: ProductionRules, token: Token) -> Optional[int]
       return index;
 
 class ProductionRes(TypedDict):
-  tokenIndex: int
+  tokenIndex: int;
+  processedState: SemanticState;
 
-def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: int = 0) -> ProductionRes:
+def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str, state: Optional[SemanticState], initialTokenindex: int = 0) -> ProductionRes:
   # errors: list[str] = [];                                                   # Lista de erros entontrados
   tokenIndex = initialTokenindex;                                             # Index do token lido
+  currentState: SemanticState = state if not state == None else { 'fowardType': None }
   if (len(tokens) < 1):                                                       # Se não houver mais tokens
     raise Exception("Não há tokens suficientes");
 
@@ -88,12 +97,18 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
     if (canProductionBeEmpty(prod)):
       return {
         'tokenIndex': tokenIndex,
+        "processedState": currentState,
       }
     raise Exception('Não encotrada produção adequada');
   
   rule: Rule = prod[productionIndex];                                         # Define a regra de produção a ser usada
-  print("selected rule index: ", productionIndex, "\n");
-  print(rule);
+  #print("selected rule index: ", productionIndex, "\n");
+  #print(rule);
+
+
+
+  #if (productionName == '<DeclaracaoDeVariavelDeStruct>'):
+  #  print('');
 
   for to in rule:
     if (tokenIndex >= len(tokens)):
@@ -109,17 +124,35 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
         print("\n\n-- produção tentado entcontrar");
         print(to);                                                  # Erro caso  a produção não exista
         raise Exception("Produção inexistente!!");
-      res = Production(p, tokens, tokenIndex);
+      res = Production(p, tokens, to, currentState, tokenIndex);
       tokenIndex = res['tokenIndex'] - 1;
     
     elif (isSemiTerminal(to)):                                               # Se for um terminal, cujo valor do token não é importante
       if (matchSemiterminal(lookahead.token, to)):                           # verifica o apenas se o tipo do token é o esperado
-        print("Passado ", to, " - ", lookahead.value);
+        #print("Passado ", to, " - ", lookahead.value);
+        # Se validando <Tipo>
+        if (productionName == '<Tipo>'):
+          # Defina as proximas declarações como do tipo definido em lookahead.value
+          currentState["fowardType"] = lookahead.value;
+
+        # Se validando <ListaDeVariaveisStruct>
+        if (productionName == '<ListaDeVariaveisStruct>'):
+          # E existe um tipo definido para as declarações
+          if (not currentState["fowardType"] == None):
+            # Adicione o simbolo lido (lookahead.value) na tabela de simbolos como tendo
+            # o dipo definido em currentState["fowardType"]
+            symbolTable[lookahead.value] = currentState["fowardType"];
+            #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
         raise Exception(msg);
     elif (to == lookahead.value):                                            # se for um termina, verifica se o valor recebido é igual
-      print("Passado: ", to, " - ", lookahead.value);                                                  # ao valor esperao
+      #print("Passado: ", to, " - ", lookahead.value);                                                  # ao valor esperao
+      # Se validando <Tipo>
+      if (productionName == '<Tipo>'):
+        # Defina as proximas declarações como do tipo definido em lookahead.value
+        currentState["fowardType"] = lookahead.value;
+        #print('');    
     else:                                                                    # se não for, lança erro
       print(rule);
       print(lookahead);
@@ -127,9 +160,19 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', initialTokenindex: 
     tokenIndex = tokenIndex + 1;
   return {
     'tokenIndex': tokenIndex,
+    "processedState": currentState,
   };
 
   
 if __name__ == "__main__":
   # Testes de operador relacional
   d = 54;
+
+# Imprime a tabela de simbolos
+def printSymbolTable():
+  # Cabeçalho da tabela
+  print("{:<20} {:<10}\n".format('SIMBOLO', 'TIPO'))
+ 
+  # Linhas da tabela
+  for key, value in symbolTable.items():
+      print("{:<20} {:<10}".format(key, value))

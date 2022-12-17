@@ -1,5 +1,5 @@
-from Prooduction import Production
-from Sintatic.ProductionRules import AreaDeFuncoesEProcedimentos, EstruturaDoPrograma, OpcionaisConstantes, OpcionaislVariaveisGlobais, OpcionalStruct
+from Prooduction import Production, printSymbolTable
+from Sintatic.ProductionRules import EstruturaDoPrograma
 from TokenUtils.Token import Token
 from TokenUtils.orderTokens import isError, orderTokens
 from automata.findTokensInStringAutomata import findTokensInStringAutomata
@@ -57,7 +57,8 @@ def lexico():
     if (errorsNum == 0):
       print("\n\n-------------- Sintatico -------------- \n\n");
       #tokensFound.append(Token('EOF', tokensFound[-1].line, 0, 0, 'EOF'));
-      Production(EstruturaDoPrograma, tokensFound);
+      Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', None, 0);
+      printSymbolTable();
   return;
 
 lexico();
