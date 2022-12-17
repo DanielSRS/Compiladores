@@ -150,7 +150,13 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
             # Adicione o simbolo lido (lookahead.value) na tabela de simbolos como tendo
             # o dipo definido em currentState["fowardType"]
             symbolTable[lookahead.value] = currentState["fowardType"];
-            #printSymbolTable();
+        
+        # Se validando <Procedimento>
+        if (productionName == '<Procedimento>'):
+          # Adicione o procedimento na tabela de simbolos e defina o tipo como Procedimento
+          # pois procedimentos não tem retorno
+          symbolTable[lookahead.value] = 'Procedimento';
+          #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
         raise Exception(msg);
