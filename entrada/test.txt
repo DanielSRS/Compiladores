@@ -1,0 +1,115 @@
+/**
+Estrutura do prgrama:
+Delacação de constantes: Opcional;
+Declaração de estruturas e extends: Opcional
+Declaração de variáveis globais: Opcional
+Declaração de funções e procedimentos: Nescessário
+
+
+Algumas diferenças acabaram surgindo entra essa gramtica e a anterior,
+sendo as mais relevantes, a mudança na ordem da estrutura do programa,
+que começa com as contantes (antes começava com as estruturas)
+
+o extends de um tipo composto também mudou, agora também começa com a PRE struct,
+antes ja começava com o identificador.
+*/
+
+/**
+Declaração de contantes
+*/
+const { 
+  boolean f;
+
+  /**
+    É possivel atribuir expressões aritméticas a variáveis
+  */
+  int expressao = (a * b / t + 456);
+}
+
+/**
+Declaração de estruturas
+*/
+struct foo {
+  // Declaração de listas de membros da estrutura com ou sem atribuição
+  string bfoo, cfoo, dfoo, efoo = 88, hfoo = "string", xfoo;
+  int yfoo = a[d]; // atribuição com valor de elemento de matriz
+  string bfoo2;
+}
+struct bar extends foo {
+  int hoo = k(); // atribuição com valor de retorno de função
+  foo fb = (H[87] * i + (a + b)); // atribuição com valor aritmético
+}
+struct daniel {
+  int a = 45;
+  string hdaniel, rdaniel, edaniel, tdaniel, ydaniel;
+}
+struct s extends r {
+  boolean f_s = false;
+  int y_s[kjhk][][454];       // Declaração de matriz multidimensional
+  string b_s;
+  string h_s, r_s = lkj(), e_s[], t_s[][], y_s;
+}
+
+var { string b_var = b.d; }
+
+function int Start(int a, string b, fof slkjf) {
+
+}
+
+function real Foo() {
+
+}
+function boolean Bar() {}
+
+procedure pro () {
+  // While aceita expressoes relacionais ou logicas
+  while (a > b) {
+    while (A || (B && lkj()) ) {
+
+    } 
+    
+    if ( a || C && (fun() || kj[o])) then {
+
+    } 
+  }
+
+  // If aceita expressoes relacionais ou logicas
+  if (a || C) then {
+
+  } else { 
+    while (a >= po[er]) {
+
+    } 
+  }
+
+  matri[sdf][54][54] = "";      //  atribuição de valor a elemento da matriz
+  print(matri[sdf][54][54]);    // print de elemento de matriz
+  print(oiu);                   // print de variável
+  print("laksdjfkl lsakdfj laskjdf"); // print de string
+  print(tipo.composo);              // print de tipo composto
+
+  // stribuição de variáveis
+  v = 34;
+  lkj[sdf] = lkj();
+
+  prin(); // chamada de funções
+
+  read(matri[sdf][54][54]);
+  read(oiu);
+  read(tipo.composo);
+
+  var { 
+    string b_local_pro_var = b.d;
+    string nome_local_pro_var = "Dionisio santini "; 
+  }
+
+}
+
+function string count(strut lk) {}
+
+function foo char() {
+  var { 
+    string b_local_foo_var = b.d;
+    string nome_local_foo_var = "Dionisio santini "; 
+  }
+}
