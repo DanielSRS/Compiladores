@@ -1,4 +1,4 @@
-from Prooduction import Production, printSymbolTable
+from Prooduction import Production, SemanticState, printSymbolTable
 from Sintatic.ProductionRules import EstruturaDoPrograma
 from TokenUtils.Token import Token
 from TokenUtils.orderTokens import isError, orderTokens
@@ -18,6 +18,23 @@ def errorCount(tk: 'list[Token]'):
             ec = ec + 1;
     return ec;
 
+defaultSintaticState: SemanticState = { 
+    'fowardType': None,
+    'declaringStruct': None,
+    'isInsideAWhile': False,
+    'validating': False,
+    'simbolo': None,
+    'declarandoStruct': None
+}
+
+defaultSemanticState: SemanticState = { 
+    'fowardType': None,
+    'declaringStruct': None,
+    'isInsideAWhile': False,
+    'validating': True,
+    'simbolo': None,
+    'declarandoStruct': None,
+}
 
 def lexico():
   source_directory = 'entrada';
@@ -57,7 +74,12 @@ def lexico():
     if (errorsNum == 0):
       print("\n\n-------------- Sintatico -------------- \n\n");
       #tokensFound.append(Token('EOF', tokensFound[-1].line, 0, 0, 'EOF'));
-      Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', None, 0);
+
+      # Executa a primeira vez para fazer a analise sintatic e criar a tabela de simbolos
+      Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSintaticState, 0);
+
+      # Executa uma segunda vez para fazer a analise semantica usando a tabela populada na execução anterior
+      Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSemanticState, 0);
       printSymbolTable();
   return;
 

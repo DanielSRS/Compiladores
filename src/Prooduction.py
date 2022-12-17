@@ -5,10 +5,17 @@ from Sintatic.ProductionRules import map, ProductionRules, Rule
 SymbolTable = dict[str, str];
 
 symbolTable: SymbolTable = {};
+class DeclarandoVariavel(TypedDict):
+  levels: list[str];
+  varType: str;
 
 class SemanticState(TypedDict):
   fowardType: Optional[str];
   declaringStruct: Optional[str];
+  isInsideAWhile: bool;
+  validating: bool;
+  simbolo: Optional[str];
+  declarandoStruct: Optional[DeclarandoVariavel];
 
 def isNonTerminal(token: str):
   if (token[0] == '<' and token[len(token) - 1] == '>'):
@@ -86,7 +93,14 @@ class ProductionRes(TypedDict):
 def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str, state: Optional[SemanticState], initialTokenindex: int = 0) -> ProductionRes:
   # errors: list[str] = [];                                                   # Lista de erros entontrados
   tokenIndex = initialTokenindex;                                             # Index do token lido
-  currentState: SemanticState = state if not state == None else { 'fowardType': None, 'declaringStruct': None }
+  currentState: SemanticState = state if not state == None else {
+    'fowardType': None,
+    'declaringStruct': None,
+    'isInsideAWhile': False,
+    'validating': False,
+    'simbolo': None,
+    'declarandoStruct': None,
+  }
   if (len(tokens) < 1):                                                       # Se não houver mais tokens
     raise Exception("Não há tokens suficientes");
 
@@ -108,8 +122,12 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
 
 
 
-  #if (productionName == '<DeclaracaoStruct>'):
-  #  currentState['declaringStruct'] = True;
+  # Declaraçãõ de variavel dentro de uma estrutura
+  if (productionName == '<VariaveisDaStruct>'):
+    currentState['declarandoStruct'] = {
+      'levels': [productionName],
+      'varType': 'undefined',
+    };
 
   for to in rule:
     if (tokenIndex >= len(tokens)):
@@ -164,6 +182,16 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
         # Se estiver declarando uma estrutura, salve o nome da estrutura
         if (productionName == '<DeclaracaoStruct>'):
           currentState['declaringStruct'] = lookahead.value;
+
+        # ###################################################################################
+        if (productionName == '<ListaDeVariaveisStruct>'):
+          if (currentState["fowardType"] and currentState['declarandoStruct']):
+            currentState['declarandoStruct']['varType'] = currentState["fowardType"];
+
+        if (productionName == '<ValorDeStribuicaoStruct>' and currentState['declarandoStruct']):
+          if (lookahead.token == 'NRO' and not currentState['declarandoStruct']['varType'] == 'int'):
+            print('Atribuindo {} (de tipo numerico) a uma variável de tipo: {}'.format(lookahead.value, currentState['declarandoStruct']['varType']));
+            print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
           #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
@@ -174,7 +202,19 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
       if (productionName == '<Tipo>'):
         # Defina as proximas declarações como do tipo definido em lookahead.value
         currentState["fowardType"] = lookahead.value;
-        #print('');    
+
+      
+
+
+      ################################################################
+      # Declaraçãõ de tipo
+      if (productionName == '<Tipo>' and currentState['declarandoStruct']):
+        # Defina as proximas declarações como do tipo definido em lookahead.value
+        currentState['declarandoStruct']['varType'] = lookahead.value;
+        currentState['declarandoStruct']['levels'].append('<Tipo>');
+
+      #################################################################
+
     else:                                                                    # se não for, lança erro
       print(rule);
       print(lookahead);

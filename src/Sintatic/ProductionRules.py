@@ -173,11 +173,13 @@ OperandoRelacional = [['<ValorDeStribuicaoStruct>'], ['(', '<ExpressaoRelacional
 #! Se começar com negção então é logica
 AlgumaDasExpressoes = [
   ['!', '-IDE', '<Valor_Comecando_Com_IDE>', '<OperadorLogico>', '<Expressao Opcional>'], 
-  ['-IDE', '<Valor_Comecando_Com_IDE>', '<ADE_com_IDE_VALOR>'],
+  ['<Simbolo>', '<ADE_com_IDE_VALOR>'],
   ['-NRO', '<REL>', '<OperandoRelacional>',' <EXP_REL_Opcional>'],
   ['-CAC', '<REL>', '<OperandoRelacional>', '<EXP_REL_Opcional>'],
   ['<Boolean>', '<ADE_com_Bool>'],
 ]
+
+Simbolo = [['-IDE', '<Valor_Comecando_Com_IDE>']];
      
 #! expressao logica ou                   
 ADE_com_IDE_VALOR = [['<OperadorLogico>', '<Expressao Opcional>'], ['<REL>', '<OperandoRelacional>', '<EXP_REL_Opcional>']]
@@ -286,4 +288,6 @@ map: Mapped = {
   '<Procedimento>': Procedimento,
   '<HasAnotherFuncOrProc>': HasAnotherFuncOrProc,
   '<REL>': REL,
+  
+  '<Simbolo>': Simbolo,
 };

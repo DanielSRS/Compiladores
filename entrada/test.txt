@@ -39,9 +39,9 @@ struct bar extends foo {
   int hoo = k(); // atribuição com valor de retorno de função
   foo fb = (H[87] * i + (a + b)); // atribuição com valor aritmético
 }
-struct daniel {
+struct iel {
   int a = 45;
-  string hdaniel, rdaniel, edaniel, tdaniel, ydaniel;
+  string hiel, riel, eiel, tiel, yiel;
 }
 struct s extends r {
   boolean f_s = false;
@@ -63,21 +63,21 @@ function boolean Bar() {}
 
 procedure pro () {
   // While aceita expressoes relacionais ou logicas
-  while (a > b) {
-    while (A || (B && lkj()) ) {
+  while (da_.a > b) {
+    while (A_while || (B && lkj()) ) {
 
     } 
     
-    if ( a || C && (fun() || kj[o])) then {
+    if ( if_a || C && (fun() || kj[o])) then {
 
     } 
   }
 
   // If aceita expressoes relacionais ou logicas
-  if (a || C) then {
+  if (cond_a || C) then {
 
   } else { 
-    while (a >= po[er]) {
+    while (f[2] >= po[er]) {
 
     } 
   }
