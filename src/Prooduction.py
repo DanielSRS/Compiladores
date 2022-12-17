@@ -188,10 +188,18 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
           if (currentState["fowardType"] and currentState['declarandoStruct']):
             currentState['declarandoStruct']['varType'] = currentState["fowardType"];
 
+        # atribuindo valor numerio a variaveis não numericas
         if (productionName == '<ValorDeStribuicaoStruct>' and currentState['declarandoStruct']):
           if (lookahead.token == 'NRO' and not currentState['declarandoStruct']['varType'] == 'int'):
             print('Atribuindo {} (de tipo numerico) a uma variável de tipo: {}'.format(lookahead.value, currentState['declarandoStruct']['varType']));
             print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
+
+        # atribuindo numero de ponto flutuante a um tipo int
+        if (productionName == '<ValorDeStribuicaoStruct>' and currentState['declarandoStruct']):
+          if (lookahead.token == 'NRO' and currentState['declarandoStruct']['varType'] == 'int'):
+            if '.' in lookahead.value:
+              print('Atribuindo {} (real) a uma variável de tipo int'.format(lookahead.value));
+              print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
           #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
