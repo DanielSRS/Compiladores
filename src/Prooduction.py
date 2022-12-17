@@ -184,6 +184,7 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
           currentState['declaringStruct'] = lookahead.value;
 
         # ###################################################################################
+        # Validando as atribuições
         if (productionName == '<ListaDeVariaveisStruct>'):
           if (currentState["fowardType"] and currentState['declarandoStruct']):
             currentState['declarandoStruct']['varType'] = currentState["fowardType"];
@@ -200,6 +201,12 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
             if '.' in lookahead.value:
               print('Atribuindo {} (real) a uma variável de tipo int'.format(lookahead.value));
               print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
+
+        # atribuindo cadeia de caracteres a variaveis não string
+        if (productionName == '<ValorDeStribuicaoStruct>' and currentState['declarandoStruct']):
+          if (lookahead.token == 'CAC' and not currentState['declarandoStruct']['varType'] == 'string'):
+            print('Atribuindo {} (de tipo string) a uma variável de tipo: {}'.format(lookahead.value, currentState['declarandoStruct']['varType']));
+            print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
           #printSymbolTable();
       else:
         msg = "Esperado: " + to + " mas recebido" + lookahead.token;
@@ -230,6 +237,8 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
     tokenIndex = tokenIndex + 1;
   if (productionName == '<DeclaracaoStruct>'):
     currentState['declaringStruct'] = None;
+    #currentState['declarandoStruct'] = None;
+    #currentState['fowardType'] = None;
   return {
     'tokenIndex': tokenIndex,
     "processedState": currentState,

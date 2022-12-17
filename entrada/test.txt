@@ -40,7 +40,7 @@ struct bar extends foo {
   foo fb = (H[87] * i + (a + b)); // atribuição com valor aritmético
 }
 struct iel {
-  int a = 45.4;
+  int a = "sdf";
   string hiel, riel, eiel, tiel, yiel;
 }
 struct s extends r {
