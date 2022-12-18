@@ -46,7 +46,7 @@ struct iel {
 struct s extends r {
   boolean f_s = false;
   int y_s[kjhk][][454];       // Declaração de matriz multidimensional
-  string b_s;
+  string b_s = true;
   string h_s, r_s = lkj(), e_s[], t_s[][], y_s;
 }
 

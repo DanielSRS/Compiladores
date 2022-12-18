@@ -145,7 +145,13 @@ def Production(prod: ProductionRules, tokens: 'list[Token]', productionName: str
         raise Exception("Produção inexistente!!");
       res = Production(p, tokens, to, currentState, tokenIndex);
       tokenIndex = res['tokenIndex'] - 1;
-    
+
+      # atribuindo booleanos a variaveis não booleanas
+      if (productionName == '<ValorDeStribuicaoStruct>' and currentState['declarandoStruct']):
+        if (productionIndex == 3 and not currentState['declarandoStruct']['varType'] == 'boolean'):
+          print('Atribuindo {} (de tipo boolean) a uma variável de tipo: {}'.format(lookahead.value, currentState['declarandoStruct']['varType']));
+          print('\n\t\tErro na linha {}:{} a {}\n\n'.format(lookahead.line, lookahead.tokenStartIndex, lookahead.tokenEndIndex));
+  
     elif (isSemiTerminal(to)):                                               # Se for um terminal, cujo valor do token não é importante
       if (matchSemiterminal(lookahead.token, to)):                           # verifica o apenas se o tipo do token é o esperado
         #print("Passado ", to, " - ", lookahead.value);
