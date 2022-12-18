@@ -72,7 +72,7 @@ def lexico():
     source_file.close();
     outputFile.close();
     if (errorsNum == 0):
-      print("\n\n-------------- Sintatico -------------- \n\n");
+      print("\n\n\n\n");
       #tokensFound.append(Token('EOF', tokensFound[-1].line, 0, 0, 'EOF'));
 
       # Executa a primeira vez para fazer a analise sintatic e criar a tabela de simbolos
@@ -80,6 +80,11 @@ def lexico():
 
       # Executa uma segunda vez para fazer a analise semantica usando a tabela populada na execução anterior
       #Production(EstruturaDoPrograma, tokensFound, '<EstruturaDoPrograma>', defaultSemanticState, 0);
+      print('\n/*');
+      print('*');
+      print('* Tabela de simbolos');
+      print('*');
+      print('*/\n');
       printSymbolTable();
   return;
 

@@ -56,7 +56,7 @@ AtribuicaoMultiplaStruct = [['<AtribuicaoDeVariavelStruc>', '<OutrasAtribuicoesO
 OutrasAtribuicoesOpcionais = [[',', '<ListaDeVariaveisStruct>'], []]
 # Valor opcional de atribuiçao
 AtribuicaoDeVariavelStruc = [['=', '<ValorDeStribuicaoStruct>'], []]
-ValorDeStribuicaoStruct = [['-IDE', '<Valor_Comecando_Com_IDE>', '<VALESSSSXPRESS>'], ['-NRO'], ['-CAC'], ['<Boolean>'], ['(', '<ExpressaoAritmetica>', ')'], ['!', '-IDE', '<Valor_Comecando_Com_IDE>', '<OperadorLogico>', '<Expressao Opcional>']]
+ValorDeStribuicaoStruct = [['<Simbolo>', '<VALESSSSXPRESS>'], ['-NRO'], ['-CAC'], ['<Boolean>'], ['(', '<ExpressaoAritmetica>', ')'], ['!', '-IDE', '<Valor_Comecando_Com_IDE>', '<OperadorLogico>', '<Expressao Opcional>']]
            
 # elemento de matriz
 # elemento de tipo composto

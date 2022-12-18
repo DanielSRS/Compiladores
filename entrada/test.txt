@@ -23,7 +23,7 @@ const {
   /**
     É possivel atribuir expressões aritméticas a variáveis
   */
-  int expressao = (a * b / t + 456);
+  int expressao = (a_exp * b_exp / t_exp + 456);
 }
 
 /**
@@ -32,7 +32,7 @@ Declaração de estruturas
 struct foo {
   // Declaração de listas de membros da estrutura com ou sem atribuição
   string bfoo, cfoo, dfoo, efoo = 88, hfoo = "string", xfoo;
-  int yfoo = a[d]; // atribuição com valor de elemento de matriz
+  int yfoo = a_matrix_foo_struct[d]; // atribuição com valor de elemento de matriz
   string bfoo2;
 }
 struct bar extends foo {
@@ -50,7 +50,7 @@ struct s extends r {
   string h_s, r_s = lkj(), e_s[], t_s[][], y_s;
 }
 
-var { string b_var = b.d; }
+var { string b_var = bcomposto.d; }
 
 function int Start(int a, string b, fof slkjf) {
 
